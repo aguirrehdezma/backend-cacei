@@ -19,7 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('programas_educativos/', include('programas_educativos.urls')),
-    path('criterios_desempeno/', include('criterios_desempeno.urls')),
-    path('unidades_tematicas/', include('unidades_tematicas.urls')),
+    path('api/', include('gestion_academica.urls')),
 ]
