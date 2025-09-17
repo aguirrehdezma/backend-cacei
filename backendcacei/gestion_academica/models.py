@@ -48,3 +48,28 @@ class CriterioDesempeno(models.Model):
     
     def __str__(self):
         return self.codigo
+
+class Curso(models.Model):
+    OBLIGATORIO = 'obligatorio'
+    OPTATIVO = 'optativo'
+
+    TIPO_CHOICES = [
+        (OBLIGATORIO, 'Obligatorio'),
+        (OPTATIVO, 'Optativo'),
+    ]
+    
+    curso_id = models.AutoField(primary_key=True)
+    # programa = models.ForeignKey(ProgramaEducativo, on_delete=models.CASCADE, related_name='cursos', db_column='programa_id')
+    clave = models.CharField(max_length=20, unique=True)
+    nombre = models.CharField(max_length=100)
+    seriacion = models.TextField(blank=True, null=True)
+    ubicacion = models.CharField(max_length=50)
+    tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=OBLIGATORIO)
+    horas_totales = models.IntegerField()
+    objetivo_general = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.nombre
