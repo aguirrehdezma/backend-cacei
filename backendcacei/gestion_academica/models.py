@@ -76,7 +76,19 @@ class Curso(models.Model):
 
 class EstrategiaEnsenanza(models.Model):
     estrategia_id = models.AutoField(primary_key=True)
-    # curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='estrategias', db_column='curso_id')
+    # curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='estrategias_ensenanza', db_column='curso_id')
+    numero = models.IntegerField()
+    descripcion = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return str(self.numero)
+
+class EstrategiaEvaluacion(models.Model):
+    estrategia_id = models.AutoField(primary_key=True)
+    # curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='estrategias_evaluacion', db_column='curso_id')
     numero = models.IntegerField()
     descripcion = models.TextField(blank=True, null=True)
     
