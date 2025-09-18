@@ -109,3 +109,18 @@ class ObjetivoEducacional(models.Model):
     
     def __str__(self):
         return self.codigo
+
+class Bibliografia(models.Model):
+    bibliografia_id = models.AutoField(primary_key=True)
+    # curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='bibliografias', db_column='curso_id')
+    numero = models.IntegerField()
+    autor = models.CharField(max_length=100)
+    titulo = models.CharField(max_length=200)
+    editorial = models.CharField(max_length=100)
+    anio_publicacion = models.PositiveSmallIntegerField()
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.numero}. {self.autor} - {self.titulo} ({self.anio_publicacion})"

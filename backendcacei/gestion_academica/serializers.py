@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from gestion_academica.models import CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, ObjetivoEducacional, ProgramaEducativo, UnidadTematica
+from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, ObjetivoEducacional, ProgramaEducativo, UnidadTematica
 
 class ProgramaEducativoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,3 +43,9 @@ class ObjetivoEducacionalSerializer(serializers.ModelSerializer):
         model = ObjetivoEducacional
         fields = ['objetivo_id', 'codigo', 'descripcion']
         read_only_fields = ['objetivo_id']
+
+class BibliografiaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bibliografia
+        fields = ['bibliografia_id', 'numero', 'autor', 'titulo', 'editorial', 'anio_publicacion']
+        read_only_fields = ['bibliografia_id']
