@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from gestion_academica.models import CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, ProgramaEducativo, UnidadTematica
-from gestion_academica.serializers import CriterioDesempenoSerializer, CursoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
+from gestion_academica.models import CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, ObjetivoEducacional, ProgramaEducativo, UnidadTematica
+from gestion_academica.serializers import CriterioDesempenoSerializer, CursoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, ObjetivoEducacionalSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
 
 # Create your views here.
 class ProgramaEducativoViewSet(viewsets.ModelViewSet):
@@ -27,3 +27,7 @@ class EstrategiaEnsenanzaViewSet(viewsets.ModelViewSet):
 class EstrategiaEvaluacionViewSet(viewsets.ModelViewSet):
     queryset = EstrategiaEvaluacion.objects.all()
     serializer_class = EstrategiaEvaluacionSerializer
+
+class ObjetivoEducacionalViewSet(viewsets.ModelViewSet):
+    queryset = ObjetivoEducacional.objects.all()
+    serializer_class = ObjetivoEducacionalSerializer

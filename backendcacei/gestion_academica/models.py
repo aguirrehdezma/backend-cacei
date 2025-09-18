@@ -97,3 +97,15 @@ class EstrategiaEvaluacion(models.Model):
     
     def __str__(self):
         return str(self.numero)
+
+class ObjetivoEducacional(models.Model):
+    objetivo_id = models.AutoField(primary_key=True)
+    # programa = models.ForeignKey(ProgramaEducativo, on_delete=models.CASCADE, related_name='objetivos_educacionales', db_column='programa_id')
+    codigo = models.CharField(max_length=10, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.codigo
