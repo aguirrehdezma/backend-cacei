@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from gestion_academica.models import AtributoPE, Bibliografia, CriterioDesempeno, Curso, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, ProductoAcademico, ProgramaEducativo, UnidadTematica
-from gestion_academica.serializers import AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, ProductoAcademicoSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
+from gestion_academica.models import AtributoCACEI, AtributoPE, Bibliografia, CriterioDesempeno, Curso, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, ProductoAcademico, ProgramaEducativo, UnidadTematica
+from gestion_academica.serializers import AtributoCACEISerializer, AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, ProductoAcademicoSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
 
 # Create your views here.
 class ProgramaEducativoViewSet(viewsets.ModelViewSet):
@@ -55,3 +55,7 @@ class ObjetivoEspecificoViewSet(viewsets.ModelViewSet):
 class AtributoPEViewSet(viewsets.ModelViewSet):
     queryset = AtributoPE.objects.all()
     serializer_class = AtributoPESerializer
+
+class AtributoCACEIViewSet(viewsets.ModelViewSet):
+    queryset = AtributoCACEI.objects.all()
+    serializer_class = AtributoCACEISerializer
