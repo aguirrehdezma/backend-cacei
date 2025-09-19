@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ProductoAcademico, ProgramaEducativo, UnidadTematica
+from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ProductoAcademico, ProgramaEducativo, UnidadTematica
 
 class ProgramaEducativoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,3 +61,9 @@ class ProductoAcademicoSerializer(serializers.ModelSerializer):
         model = ProductoAcademico
         fields = ['producto_id', 'descripcion', 'anio', 'tipo', 'detalles']
         read_only_fields = ['producto_id']
+
+class EjeConocimientoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EjeConocimiento
+        fields = ['eje_id', 'nombre', 'descripcion']
+        read_only_fields = ['eje_id']
