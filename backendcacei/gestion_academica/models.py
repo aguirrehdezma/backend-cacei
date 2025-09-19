@@ -124,3 +124,21 @@ class Bibliografia(models.Model):
     
     def __str__(self):
         return f"{self.numero}. {self.autor} - {self.titulo} ({self.anio_publicacion})"
+
+class HorasSemana(models.Model):
+    horas_id = models.AutoField(primary_key=True)
+    # curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='horas_semana', db_column='curso_id')
+    horas_totales = models.PositiveSmallIntegerField()
+    horas_aula = models.PositiveSmallIntegerField()
+    horas_laboratorio = models.PositiveSmallIntegerField()
+    horas_practicas = models.PositiveSmallIntegerField()
+    numero_grupos = models.PositiveSmallIntegerField()
+    calificacion_promedio = models.DecimalField(max_digits=3, decimal_places=1)
+    porcentaje_aprobacion = models.DecimalField(max_digits=5, decimal_places=2)
+    porcentaje_reprobacion = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Horas Totales: {self.horas_totales}"

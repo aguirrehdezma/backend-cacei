@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, ObjetivoEducacional, ProgramaEducativo, UnidadTematica
+from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ProgramaEducativo, UnidadTematica
 
 class ProgramaEducativoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,3 +49,9 @@ class BibliografiaSerializer(serializers.ModelSerializer):
         model = Bibliografia
         fields = ['bibliografia_id', 'numero', 'autor', 'titulo', 'editorial', 'anio_publicacion']
         read_only_fields = ['bibliografia_id']
+
+class HorasSemanaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HorasSemana
+        fields = ['horas_id', 'horas_totales', 'horas_aula', 'horas_laboratorio', 'horas_practicas', 'numero_grupos', 'calificacion_promedio', 'porcentaje_aprobacion', 'porcentaje_reprobacion']
+        read_only_fields = ['horas_id']

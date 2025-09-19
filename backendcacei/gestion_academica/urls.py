@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from gestion_academica.views import BibliografiaViewSet, CriterioDesempenoViewSet, CursoViewSet, EstrategiaEnsenanzaViewSet, EstrategiaEvaluacionViewSet, ObjetivoEducacionalViewSet, ProgramaEducativoViewSet, UnidadTematicaViewSet
+from gestion_academica.views import BibliografiaViewSet, CriterioDesempenoViewSet, CursoViewSet, EstrategiaEnsenanzaViewSet, EstrategiaEvaluacionViewSet, HorasSemanaViewSet, ObjetivoEducacionalViewSet, ProgramaEducativoViewSet, UnidadTematicaViewSet
 
 router = routers.SimpleRouter()
 router.register(r'programas_educativos', ProgramaEducativoViewSet, basename='programa-educativo')
@@ -11,4 +11,5 @@ router.register(r'estrategias_ensenanza', EstrategiaEnsenanzaViewSet, basename='
 router.register(r'estrategias_evaluacion', EstrategiaEvaluacionViewSet, basename='estrategia-evaluacion')
 router.register(r'objetivos_educacionales', ObjetivoEducacionalViewSet, basename='objetivo-educacional')
 router.register(r'bibliografia', BibliografiaViewSet, basename='bibliografia')
+router.register(r'horas_semana', HorasSemanaViewSet, basename='horas-semana')
 urlpatterns = router.urls
