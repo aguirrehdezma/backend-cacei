@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ProductoAcademico, ProgramaEducativo, UnidadTematica
-from gestion_academica.serializers import BibliografiaSerializer, CriterioDesempenoSerializer, CursoSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ProductoAcademicoSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
+from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, ProductoAcademico, ProgramaEducativo, UnidadTematica
+from gestion_academica.serializers import BibliografiaSerializer, CriterioDesempenoSerializer, CursoSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, ProductoAcademicoSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
 
 # Create your views here.
 class ProgramaEducativoViewSet(viewsets.ModelViewSet):
@@ -47,3 +47,7 @@ class ProductoAcademicoViewSet(viewsets.ModelViewSet):
 class EjeConocimientoViewSet(viewsets.ModelViewSet):
     queryset = EjeConocimiento.objects.all()
     serializer_class = EjeConocimientoSerializer
+
+class ObjetivoEspecificoViewSet(viewsets.ModelViewSet):
+    queryset = ObjetivoEspecifico.objects.all()
+    serializer_class = ObjetivoEspecificoSerializer

@@ -179,3 +179,15 @@ class EjeConocimiento(models.Model):
     
     def __str__(self):
         return self.nombre
+
+class ObjetivoEspecifico(models.Model):
+    objetivo_id = models.AutoField(primary_key=True)
+    # curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='objetivos_especificos', db_column='curso_id')
+    descripcion = models.TextField(blank=True, null=True)
+    orden = models.IntegerField()
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return str(self.objetivo_id)
