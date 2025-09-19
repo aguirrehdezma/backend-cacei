@@ -191,3 +191,17 @@ class ObjetivoEspecifico(models.Model):
     
     def __str__(self):
         return str(self.objetivo_id)
+
+class AtributoPE(models.Model):
+    atributo_pe_id = models.AutoField(primary_key=True)
+    # programa = models.ForeignKey(ProgramaEducativo, on_delete=models.CASCADE, related_name='atributos_pe', db_column='programa_id')
+    codigo = models.CharField(max_length=10, unique=True)
+    nombre = models.CharField(max_length=100)
+    nombre_abreviado = models.CharField(max_length=50)
+    descripcion = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.codigo
