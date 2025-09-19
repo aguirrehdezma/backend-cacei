@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ProgramaEducativo, UnidadTematica
+from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ProductoAcademico, ProgramaEducativo, UnidadTematica
 
 # Register your models here.
 admin.site.register(ProgramaEducativo)
@@ -12,3 +12,4 @@ admin.site.register(EstrategiaEvaluacion)
 admin.site.register(ObjetivoEducacional)
 admin.site.register(Bibliografia)
 admin.site.register(HorasSemana)
+admin.site.register(ProductoAcademico)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ProgramaEducativo, UnidadTematica
+from gestion_academica.models import Bibliografia, CriterioDesempeno, Curso, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ProductoAcademico, ProgramaEducativo, UnidadTematica
 
 class ProgramaEducativoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,3 +55,9 @@ class HorasSemanaSerializer(serializers.ModelSerializer):
         model = HorasSemana
         fields = ['horas_id', 'horas_totales', 'horas_aula', 'horas_laboratorio', 'horas_practicas', 'numero_grupos', 'calificacion_promedio', 'porcentaje_aprobacion', 'porcentaje_reprobacion']
         read_only_fields = ['horas_id']
+
+class ProductoAcademicoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductoAcademico
+        fields = ['producto_id', 'descripcion', 'anio', 'tipo', 'detalles']
+        read_only_fields = ['producto_id']
