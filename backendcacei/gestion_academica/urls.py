@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from gestion_academica.views import AtributoCACEIViewSet, AtributoPEViewSet, BibliografiaViewSet, CriterioDesempenoViewSet, CursoViewSet, EjeConocimientoViewSet, EstrategiaEnsenanzaViewSet, EstrategiaEvaluacionViewSet, HorasSemanaViewSet, ObjetivoEducacionalViewSet, ObjetivoEspecificoViewSet, ProductoAcademicoViewSet, ProgramaEducativoViewSet, UnidadTematicaViewSet
+from gestion_academica.views import AtributoCACEIViewSet, AtributoPEViewSet, BibliografiaViewSet, CriterioDesempenoViewSet, CursoViewSet, EjeConocimientoViewSet, EstrategiaEnsenanzaViewSet, EstrategiaEvaluacionViewSet, HorasSemanaViewSet, ObjetivoEducacionalViewSet, ObjetivoEspecificoViewSet, ProgramaEducativoViewSet, UnidadTematicaViewSet
 
 router = routers.SimpleRouter()
 router.register(r'programas_educativos', ProgramaEducativoViewSet, basename='programa-educativo')
@@ -12,7 +12,6 @@ router.register(r'estrategias_evaluacion', EstrategiaEvaluacionViewSet, basename
 router.register(r'objetivos_educacionales', ObjetivoEducacionalViewSet, basename='objetivo-educacional')
 router.register(r'bibliografia', BibliografiaViewSet, basename='bibliografia')
 router.register(r'horas_semana', HorasSemanaViewSet, basename='horas-semana')
-router.register(r'productos_academicos', ProductoAcademicoViewSet, basename='producto-academico')
 router.register(r'ejes_conocimiento', EjeConocimientoViewSet, basename='eje-conocimiento')
 router.register(r'objetivos_especificos', ObjetivoEspecificoViewSet, basename='objetivo-especifico')
 router.register(r'atributos_pe', AtributoPEViewSet, basename='atributo-pe')

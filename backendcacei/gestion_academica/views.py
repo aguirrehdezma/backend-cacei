@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from gestion_academica.models import AtributoCACEI, AtributoPE, Bibliografia, CriterioDesempeno, Curso, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, ProductoAcademico, ProgramaEducativo, UnidadTematica
-from gestion_academica.serializers import AtributoCACEISerializer, AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, ProductoAcademicoSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
+from gestion_academica.models import AtributoCACEI, AtributoPE, Bibliografia, CriterioDesempeno, Curso, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, ProgramaEducativo, UnidadTematica
+from gestion_academica.serializers import AtributoCACEISerializer, AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
 
 # Create your views here.
 class ProgramaEducativoViewSet(viewsets.ModelViewSet):
@@ -39,10 +39,6 @@ class BibliografiaViewSet(viewsets.ModelViewSet):
 class HorasSemanaViewSet(viewsets.ModelViewSet):
     queryset = HorasSemana.objects.all()
     serializer_class = HorasSemanaSerializer
-
-class ProductoAcademicoViewSet(viewsets.ModelViewSet):
-    queryset = ProductoAcademico.objects.all()
-    serializer_class = ProductoAcademicoSerializer
 
 class EjeConocimientoViewSet(viewsets.ModelViewSet):
     queryset = EjeConocimiento.objects.all()

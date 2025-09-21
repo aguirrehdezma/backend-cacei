@@ -143,32 +143,6 @@ class HorasSemana(models.Model):
     def __str__(self):
         return f"Horas Totales: {self.horas_totales}"
 
-class ProductoAcademico(models.Model):
-    PUBLICACION = 'publicacion'
-    PROYECTO = 'proyecto'
-    PATENTE = 'patente'
-    OTRO = 'otro'
-
-    TIPO_CHOICES = [
-        (PUBLICACION, 'Publicación'),
-        (PROYECTO, 'Proyecto'),
-        (PATENTE, 'Patente'),
-        (OTRO, 'Otro'),
-    ]
-    
-    producto_id = models.AutoField(primary_key=True)
-    # Relación con profesor_id
-    descripcion = models.TextField(blank=True, null=True)
-    anio = models.PositiveSmallIntegerField()
-    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=PUBLICACION)
-    detalles = models.TextField(blank=True, null=True)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return f"Producto {self.producto_id} - {self.anio}"
-
 class EjeConocimiento(models.Model):
     eje_id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50, unique=True)
