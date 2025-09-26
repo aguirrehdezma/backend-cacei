@@ -27,7 +27,7 @@ class ProgramaEducativo(models.Model):
 
 class UnidadTematica(models.Model):
     unidad_id = models.AutoField(primary_key=True)
-    curso = models.ForeignKey('Curso', on_delete=models.PROTECT, related_name='unidades_tematicas', db_column='curso_id')
+    curso_id = models.ForeignKey('Curso', on_delete=models.PROTECT, related_name='unidades_tematicas', db_column='curso_id')
     numero = models.IntegerField(unique=True)
     descripcion = models.TextField(blank=True, null=True)
     
@@ -39,7 +39,7 @@ class UnidadTematica(models.Model):
 
 class CriterioDesempeno(models.Model):
     criterio_id = models.AutoField(primary_key=True)
-    atributo_pe = models.ForeignKey('AtributoPE', on_delete=models.PROTECT, related_name='criterios_desempeno', db_column='atributo_pe_id')
+    atributo_pe_id = models.ForeignKey('AtributoPE', on_delete=models.PROTECT, related_name='criterios_desempeno', db_column='atributo_pe_id')
     codigo = models.CharField(max_length=10, unique=True)
     descripcion = models.TextField(blank=True, null=True)
     
@@ -59,7 +59,7 @@ class Curso(models.Model):
     ]
     
     curso_id = models.AutoField(primary_key=True)
-    programa = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='cursos', db_column='programa_id')
+    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='cursos', db_column='programa_id')
     clave = models.CharField(max_length=20, unique=True)
     nombre = models.CharField(max_length=100)
     seriacion = models.TextField(blank=True, null=True)
@@ -76,7 +76,7 @@ class Curso(models.Model):
 
 class EstrategiaEnsenanza(models.Model):
     estrategia_id = models.AutoField(primary_key=True)
-    curso = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='estrategias_ensenanza', db_column='curso_id')
+    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='estrategias_ensenanza', db_column='curso_id')
     numero = models.IntegerField()
     descripcion = models.TextField(blank=True, null=True)
     
@@ -88,7 +88,7 @@ class EstrategiaEnsenanza(models.Model):
 
 class EstrategiaEvaluacion(models.Model):
     estrategia_id = models.AutoField(primary_key=True)
-    curso = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='estrategias_evaluacion', db_column='curso_id')
+    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='estrategias_evaluacion', db_column='curso_id')
     numero = models.IntegerField()
     descripcion = models.TextField(blank=True, null=True)
     
@@ -100,7 +100,7 @@ class EstrategiaEvaluacion(models.Model):
 
 class ObjetivoEducacional(models.Model):
     objetivo_id = models.AutoField(primary_key=True)
-    programa = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='objetivos_educacionales', db_column='programa_id')
+    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='objetivos_educacionales', db_column='programa_id')
     codigo = models.CharField(max_length=10, unique=True)
     descripcion = models.TextField(blank=True, null=True)
     
@@ -112,7 +112,7 @@ class ObjetivoEducacional(models.Model):
 
 class Bibliografia(models.Model):
     bibliografia_id = models.AutoField(primary_key=True)
-    curso = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='bibliografias', db_column='curso_id')
+    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='bibliografias', db_column='curso_id')
     numero = models.IntegerField()
     autor = models.CharField(max_length=100)
     titulo = models.CharField(max_length=200)
@@ -127,7 +127,7 @@ class Bibliografia(models.Model):
 
 class HorasSemana(models.Model):
     horas_id = models.AutoField(primary_key=True)
-    curso = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='horas_semana', db_column='curso_id')
+    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='horas_semana', db_column='curso_id')
     horas_totales = models.PositiveSmallIntegerField()
     horas_aula = models.PositiveSmallIntegerField()
     horas_laboratorio = models.PositiveSmallIntegerField()
@@ -156,7 +156,7 @@ class EjeConocimiento(models.Model):
 
 class ObjetivoEspecifico(models.Model):
     objetivo_id = models.AutoField(primary_key=True)
-    curso = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='objetivos_especificos', db_column='curso_id')
+    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='objetivos_especificos', db_column='curso_id')
     descripcion = models.TextField(blank=True, null=True)
     orden = models.IntegerField()
     
@@ -168,7 +168,7 @@ class ObjetivoEspecifico(models.Model):
 
 class AtributoPE(models.Model):
     atributo_pe_id = models.AutoField(primary_key=True)
-    programa = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='atributos_pe', db_column='programa_id')
+    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='atributos_pe', db_column='programa_id')
     codigo = models.CharField(max_length=10, unique=True)
     nombre = models.CharField(max_length=100)
     nombre_abreviado = models.CharField(max_length=50)
