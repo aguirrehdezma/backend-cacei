@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'vinculacion_practicas',
     'gestion_de_profesores',
     'usuarios_y_acceso',
+    'cedulas',
 ]
 
 MIDDLEWARE = [

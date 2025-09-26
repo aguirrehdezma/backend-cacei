@@ -66,7 +66,7 @@ class EvaluacionIndicador(models.Model):
 
 class AportacionPE(models.Model):
     aportacion_id = models.AutoField(primary_key=True)
-    #profesor_id = models.ForeignKey('gestion_academica.Profesor', on_delete=models.CASCADE)
+    profesor_id = models.ForeignKey('gestion_de_profesores.Profesor', on_delete=models.PROTECT, related_name='aportaciones_pe', db_column='profesor_id')
     descripcion = models.TextField()
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -77,7 +77,7 @@ class AportacionPE(models.Model):
 
 class GestionAcademica(models.Model):
     gestion_id = models.AutoField(primary_key=True)
-    #profesor_id = models.ForeignKey('gestion_academica.Profesor', on_delete=models.CASCADE)
+    profesor_id = models.ForeignKey('gestion_de_profesores.Profesor', on_delete=models.PROTECT, related_name='gestion_academica', db_column='profesor_id')
     actividad = models.CharField(max_length=100)
     institucion = models.CharField(max_length=100)
     fecha_inicio = models.DateField()
