@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'gestion_academica',
     'evaluacion_acreditacion',
     'vinculacion_practicas',
+    'gestion_de_profesores',
+    'usuarios_y_acceso',
 ]
 
 MIDDLEWARE = [

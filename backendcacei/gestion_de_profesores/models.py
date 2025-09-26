@@ -1,255 +1,166 @@
 from django.db import models
 
 # Create your models here.
-
-class Profesores():
-    TIEMPO_COMPLETO = 'tiempo_completo'
-    ASIGNATURA = 'asignatura'
-    MEDIO_TIEMPO = 'medio_tiempo'
-    OTRO = 'otro'
-
-    NOMBRAMIENTO_CHOICES = [
-        (TIEMPO_COMPLETO, 'Tiempo Completo'),
-        (ASIGNATURA, 'Asignatura'),
-        (MEDIO_TIEMPO, 'Medio Tiempo'),
-        (OTRO, 'Otro'),
-    ]
-
+class Profesor(models.Model):
     profesor_id = models.AutoField(primary_key=True)
-    numero_empleado = models.IntegerField()
-    apellido_paterno = models.TextField()
-    apellido_materno = models.TextField()
-    nombres = models.TextField()
+    numero_empleado = models.CharField(max_length=20, unique=True)
+    apellido_paterno = models.CharField(max_length=50)
+    apellido_materno = models.CharField(max_length=50)
+    nombres = models.CharField(max_length=100)
     fecha_nacimiento = models.DateField()
-    nombramiento_actual = models.CharField(max_length=20, choices=NOMBRAMIENTO_CHOICES, default=TIEMPO_COMPLETO)
-    antiguedad = models.IntegerField()
-    experiencia_ingenieria = models.BooleanField()
-    created_at = models.DateField()
-    updated_at = models.DateField()
+    nombramiento_actual = models.CharField(max_length=100)
+    antiguedad = models.PositiveSmallIntegerField()
+    experiencia_ingenieria = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor(x) {self.nombres} - {self.apellido_paterno} - {self.apellido_materno}"
+        return f"Profesor: {self.nombres} - {self.apellido_paterno} - {self.apellido_materno}"
 
-
-class ProfesoresCursos():
-    TEORICO = 1
-    PRACTICO = 2
-    LABORATORIO = 3
-    OTRO = 4
+class ProfesorCurso(models.Model):
+    RESPONSABLE = 'responsable'
+    INSTRUCTOR = 'instructor'
 
     TIPO_CHOICES = [
-        (TEORICO, 'Teórico'),
-        (PRACTICO, 'Práctico'),
-        (LABORATORIO, 'Laboratorio'),
-        (OTRO, 'Otro'),
+        (RESPONSABLE, 'Responsable'),
+        (INSTRUCTOR, 'Instructor'),
     ]
 
     profesor_curso_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesores, on_delete=models.CASCADE, related_name='profesoresCursos', db_column='profesor_id')
-    curso_id = models.IntegerField()
-    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=TEORICO)
-    periodo = models.IntegerField()
-    created_at = models.DateField()
-    updated_at = models.DateField()
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='cursos', db_column='profesor_id')
+    curso_id = models.ForeignKey('gestion_academica.Curso', on_delete=models.PROTECT, related_name='profesores', db_column='curso_id')
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=RESPONSABLE)
+    periodo = models.CharField(max_length=50)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor(x) {self.profesor_id} imparte el curso de de {self.curso_id}"
+        return f"Profesor {self.profesor_id} imparte el curso {self.curso_id}"
 
-
-class FormacionAcademica():
-    LICENCIATURA = 1
-    MAESTRIA = 2
-    DOCTORADO = 3
-    OTRO = 4
+class FormacionAcademica(models.Model):
+    LICENCIATURA = 'licenciatura'
+    ESPECIALIDAD = 'especialidad'
+    MAESTRIA = 'maestria'
+    DOCTORADO = 'doctorado'
 
     NIVEL_CHOICES = [
         (LICENCIATURA, 'Licenciatura'),
+        (ESPECIALIDAD, 'Especialidad'),
         (MAESTRIA, 'Maestría'),
         (DOCTORADO, 'Doctorado'),
-        (OTRO, 'Otro'),
     ]
 
     formacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.IntegerField(Profesores, on_delete=models.CASCADE, related_name='formacionAcademica', db_column='profesor_id')
-    nivel = models.PositiveSmallIntegerField(choices=NIVEL_CHOICES, default=LICENCIATURA)
-    institucion = models.TextField()
-    pais = models.TextField()
-    anno_obtencion = models.DateField()
-    cedula_profesional= models.TextField()
-    especialidad= models.TextField()
-    created_at = models.DateField()
-    updated_at = models.DateField()
-
-    def __str__(self):
-        return f"Profesor(x) {self.profesor_id} tiene formacion academica de {self.nivel}"
-
-
-class ExperienciaProfesional():
-    DOCENTE = 1
-    DIRECTIVO = 2
-    INVESTIGADOR = 3
-    CONSULTOR = 4
-    OTRO = 5
-
-    PUESTO_CHOICES = [
-        (DOCENTE, 'Docente'),
-        (DIRECTIVO, 'Directivo'),
-        (INVESTIGADOR, 'Investigador'),
-        (CONSULTOR, 'Consultor'),
-        (OTRO, 'Otro'),
-    ]
-
-    experiencia_id = models.AutoField(primary_key=True)
-    profesor_id = models.IntegerField(Profesores, on_delete=models.CASCADE, related_name='experienciaProfesional', db_column='profesor_id')
-    organización = models.TextField()
-    puesto = models.CharField(max_length=20, choices=PUESTO_CHOICES, default=DOCENTE)
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
-    actividades = models.TextField()
-    created_at = models.DateField()
-    updated_at = models.DateField()
-
-    def __str__(self):
-        return f"Profesor(x) {self.profesor_id} tiene experiencia orifesional de {self.experiencia_id}"
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='formacion_academica', db_column='profesor_id')
+    nivel = models.CharField(max_length=20, choices=NIVEL_CHOICES, default=LICENCIATURA)
+    institucion = models.CharField(max_length=100)
+    pais = models.CharField(max_length=50)
+    anio_obtencion = models.PositiveSmallIntegerField()
+    cedula_profesional= models.CharField(max_length=50, blank=True, null=True)
+    especialidad= models.CharField(max_length=100, blank=True, null=True)
     
-
-class ExperienciaDiseno():
-    BASICO = 1
-    INTERMEDIO = 2
-    AVANZADO = 3
-    OTRO = 4
-
-    NIVEL_EXPERIENCIA_CHOICES = [
-        (BASICO, 'Básico'),
-        (INTERMEDIO, 'Intermedio'),
-        (AVANZADO, 'Avanzado'),
-        (OTRO, 'Otro'),
-    ]
-
-    diseno_id = models.AutoField(primary_key=True)
-    profesor_id = models.IntegerField(Profesores, on_delete=models.CASCADE, related_name='experienciaDiseno', db_column='profesor_id')
-    organizacion = models.TextField()
-    periodo = models.TextField()
-    nivel_experiencia = models.CharField(max_length=20, choices=NIVEL_EXPERIENCIA_CHOICES, default=BASICO)
-    descripcion = models.TextField()
-    created_at = models.DateField()
-    updated_at = models.DateField()
-
-    def __str__(self):
-        return f"Profesor(x) {self.profesor_id} tiene experiencia de diseño de {self.diseno_id}"
-
-
-class LogrosProfesionales():
-    LOCAL = 1
-    NACIONAL = 2
-    INTERNACIONAL = 3
-    OTRO = 4
-
-    RELEVANCIA_CHOICES = [
-        (LOCAL, 'Local'),
-        (NACIONAL, 'Nacional'),
-        (INTERNACIONAL, 'Internacional'),
-        (OTRO, 'Otro'),
-    ]
-
-    logro_id = models.AutoField(primary_key=True)
-    profesor_id = models.IntegerField(Profesores, on_delete=models.CASCADE, related_name='logrosProfesionales', db_column='profesor_id')
-    descripcion = models.TextField()
-    anno = models.IntegerField()
-    relevancia = models.CharField(max_length=20, choices=RELEVANCIA_CHOICES, default=LOCAL)
-    created_at = models.DateField()
-    updated_at = models.DateField()
-
-    def __str__(self):
-        return f"Profesor(x) {self.profesor_id} tiene formacion academica de {self.nivel}"
-
-
-class PremiosDistinciones():
-    premio_id = models.AutoField(primary_key=True)
-    profesor_id = models.IntegerField(Profesores, on_delete=models.CASCADE, related_name='premiosDistinciones', db_column='profesor_id')
-    descripcion = models.TextField()
-    anno = models.IntegerField()
-    institucion_otorga = models.TextField()
-    created_at = models.DateField()
-    updated_at = models.DateField()
-
-    def __str__(self):
-        return f"Profesor(x) {self.profesor_id} tiene el premio de {self.premio_id}"
-
-class ParticipacionOrganizaciones():
-    MIEMBRO = 1
-    COORDINADOR = 2
-    PRESIDENTE = 3
-    OTRO = 4
-
-    NIVEL_PARTICIPACION_CHOICES = [
-        (MIEMBRO, 'Miembro'),
-        (COORDINADOR, 'Coordinador'),
-        (PRESIDENTE, 'Presidente'),
-        (OTRO, 'Otro'),
-    ]
-
-    participacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.IntegerField(Profesores, on_delete=models.CASCADE, related_name='participacionesOrganizaciones', db_column='profesor_id')
-    organizacion = models.TextField()
-    periodo = models.TextField()
-    nivel_participacion = models.CharField(max_length=20, choices=NIVEL_PARTICIPACION_CHOICES, default=MIEMBRO)
-    created_at = models.DateField()
-    updated_at = models.DateField()
-
-    def __str__(self):
-        return f"Profesor(x) {self.profesor_id} participó en de {self.organizacion}"
-
-
-class CapacitacionDocente():
-    capacitacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.IntegerField(Profesores, on_delete=models.CASCADE, related_name='capacitacionDocente', db_column='profesor_id')
-    nombre_curso = models.TextField()
-    institucion = models.TextField()
-    pais = models.TextField()
-    anno_obtencion = models.IntegerField()
-    horas = models.IntegerField()
-    created_at = models.DateField()
-    updated_at = models.DateField()
-
-    def __str__(self):
-        return f"Profesor(x) {self.profesor_id} recibió esta capacitación {self.capacitacion_id}"
-
-class ActualizacionDisciplinar():
-    actualizacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.IntegerField(Profesores, on_delete=models.CASCADE, related_name='actualizacionDisciplinar', db_column='profesor_id')
-    nombre_curso = models.TextField()
-    institucion = models.TextField()
-    pais = models.TextField()
-    anno_obtencion = models.IntegerField()
-    horas = models.IntegerField()
-    created_at = models.DateField()
-    updated_at = models.DateField()
-
-    def __str__(self):
-        return f"Profesor(x) {self.profesor_id} recibió esta actualización disciplinar {self.actualizacion_id}"
-
-
-class ProductoAcademico(models.Model):
-    PUBLICACION = 'publicacion'
-    PROYECTO = 'proyecto'
-    PATENTE = 'patente'
-    OTRO = 'otro'
-
-    TIPO_CHOICES = [
-        (PUBLICACION, 'Publicación'),
-        (PROYECTO, 'Proyecto'),
-        (PATENTE, 'Patente'),
-        (OTRO, 'Otro'),
-    ]
-    
-    producto_id = models.AutoField(primary_key=True)
-    descripcion = models.TextField(blank=True, null=True)
-    anno = models.PositiveSmallIntegerField()
-    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=PUBLICACION)
-    detalles = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
-        return f"Producto {self.producto_id} - {self.anno}"
+        return f"Profesor {self.profesor_id} tiene formacion academica de {self.nivel}"
+
+class ExperienciaProfesional(models.Model):
+    experiencia_id = models.AutoField(primary_key=True)
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='experiencia_profesional', db_column='profesor_id')
+    organizacion = models.CharField(max_length=100)
+    puesto = models.CharField(max_length=100)
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField(null=True, blank=True)
+    actividades = models.TextField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profesor {self.profesor_id} trabajó en {self.organizacion} como {self.puesto}"
+
+class ExperienciaDiseno(models.Model):
+    diseno_id = models.AutoField(primary_key=True)
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='experiencia_disenio', db_column='profesor_id')
+    organizacion = models.CharField(max_length=100)
+    periodo = models.CharField(max_length=50)
+    nivel_experiencia = models.CharField(max_length=50)
+    descripcion = models.TextField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profesor {self.profesor_id} tiene experiencia de diseño de {self.nivel_experiencia} en {self.organizacion}"
+
+class LogroProfesional(models.Model):
+    logro_id = models.AutoField(primary_key=True)
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='logros_profesionales', db_column='profesor_id')
+    descripcion = models.TextField()
+    anio = models.PositiveSmallIntegerField(null=True, blank=True)
+    relevancia = models.TextField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profesor {self.profesor_id} tiene logros de {self.descripcion} en {self.anio}"
+
+class PremioDistincion(models.Model):
+    premio_id = models.AutoField(primary_key=True)
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='premios_distinciones', db_column='profesor_id')
+    descripcion = models.TextField()
+    anio = models.PositiveSmallIntegerField(null=True, blank=True)
+    institucion_otorga = models.CharField(max_length=100, null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profesor {self.profesor_id} recibió el premio {self.descripcion} en {self.anio}"
+
+class ParticipacionOrganizaciones(models.Model):
+    participacion_id = models.AutoField(primary_key=True)
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='participaciones_organizaciones', db_column='profesor_id')
+    organizacion = models.CharField(max_length=100)
+    periodo = models.CharField(max_length=50)
+    nivel_participacion = models.CharField(max_length=50)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profesor {self.profesor_id} participó en {self.organizacion}"
+
+class CapacitacionDocente(models.Model):
+    capacitacion_id = models.AutoField(primary_key=True)
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='capacitacion_docente', db_column='profesor_id')
+    nombre_curso = models.CharField(max_length=100)
+    institucion = models.CharField(max_length=100)
+    pais = models.CharField(max_length=50)
+    anio_obtencion = models.PositiveSmallIntegerField()
+    horas = models.PositiveSmallIntegerField()
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profesor {self.profesor_id} recibió esta capacitación docente {self.capacitacion_id}"
+
+class ActualizacionDisciplinar(models.Model):
+    actualizacion_id = models.AutoField(primary_key=True)
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='actualizacion_disciplinar', db_column='profesor_id')
+    nombre_curso = models.CharField(max_length=100)
+    institucion = models.CharField(max_length=100)
+    pais = models.CharField(max_length=50)
+    anio_obtencion = models.PositiveSmallIntegerField()
+    horas = models.PositiveSmallIntegerField()
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profesor {self.profesor_id} recibió esta actualización disciplinar {self.actualizacion_id}"
