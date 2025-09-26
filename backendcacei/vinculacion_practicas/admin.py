@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Practica
+
+from vinculacion_practicas.models import Practica
 
 # Register your models here.
 admin.site.register(Practica)

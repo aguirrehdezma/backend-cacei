@@ -1,16 +1,14 @@
 from rest_framework import routers
-from .views import AccionMejoraViewSet
-from .views import IndicadorViewSet
-from .views import EvaluacionIndicadorViewSet
-from .views import AportacionPEViewSet
-from .views import GestionAcademicaViewSet  
-from .views import HallazgoViewSet 
-from .views import AuditoriaViewSet
 
-
-
-
-
+from evaluacion_acreditacion.views import (
+    AccionMejoraViewSet,
+    IndicadorViewSet,
+    EvaluacionIndicadorViewSet,
+    AportacionPEViewSet,
+    GestionAcademicaViewSet,
+    HallazgoViewSet,
+    AuditoriaViewSet
+)
 
 router = routers.SimpleRouter()
 router.register(r'acciones_mejora', AccionMejoraViewSet, basename='accion-mejora')
@@ -21,4 +19,3 @@ router.register(r'gestion_academica', GestionAcademicaViewSet, basename='gestion
 router.register(r'hallazgos', HallazgoViewSet, basename='hallazgo')
 router.register(r'auditorias', AuditoriaViewSet, basename='auditoria')
 urlpatterns = router.urls
-
