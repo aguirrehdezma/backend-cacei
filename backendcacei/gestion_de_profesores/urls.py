@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from gestion_de_profesores.views import ActualizacionDisciplinarViewSet, CapacitacionDocenteViewSet, ExperienciaDisenoViewSet, ExperienciaProfesionalViewSet, FormacionAcademicaViewSet, LogroProfesionalViewSet, ParticipacionOrganizacionesViewSet, PremioDistincionViewSet, ProfesorCursoViewSet, ProfesorViewSet
+from gestion_de_profesores.views import ActualizacionDisciplinarViewSet, CapacitacionDocenteViewSet, ExperienciaDisenoViewSet, ExperienciaProfesionalViewSet, FormacionAcademicaViewSet, LogroProfesionalViewSet, ParticipacionOrganizacionesViewSet, PremioDistincionViewSet, ProductoAcademicoViewSet, ProfesorCursoViewSet, ProfesorViewSet
 
 router = routers.SimpleRouter()
 router.register(r'profesores', ProfesorViewSet, basename='profesor')
@@ -13,4 +13,5 @@ router.register(r'premios_distincion', PremioDistincionViewSet, basename='premio
 router.register(r'participacion_organizaciones', ParticipacionOrganizacionesViewSet, basename='participacion-organizaciones')
 router.register(r'capacitacion_docente', CapacitacionDocenteViewSet, basename='capacitacion-docente')
 router.register(r'actualizacion_disciplinar', ActualizacionDisciplinarViewSet, basename='actualizacion-disciplinar')
+router.register(r'productos_academicos', ProductoAcademicoViewSet, basename='producto-academico')
 urlpatterns = router.urls

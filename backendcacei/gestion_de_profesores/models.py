@@ -164,3 +164,29 @@ class ActualizacionDisciplinar(models.Model):
 
     def __str__(self):
         return f"Profesor {self.profesor_id} recibió esta actualización disciplinar {self.actualizacion_id}"
+
+class ProductoAcademico(models.Model):
+    PUBLICACION = 'publicacion'
+    PROYECTO = 'proyecto'
+    PATENTE = 'patente'
+    OTRO = 'otro'
+
+    TIPO_CHOICES = [
+        (PUBLICACION, 'Publicación'),
+        (PROYECTO, 'Proyecto'),
+        (PATENTE, 'Patente'),
+        (OTRO, 'Otro'),
+    ]
+    
+    producto_id = models.AutoField(primary_key=True)
+    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='productos_academicos', db_column='profesor_id')
+    descripcion = models.TextField()
+    anio = models.PositiveSmallIntegerField()
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=PUBLICACION)
+    detalles = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Producto académico: {self.descripcion} ({self.tipo})"

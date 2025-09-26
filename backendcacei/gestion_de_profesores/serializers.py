@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from gestion_de_profesores.models import ActualizacionDisciplinar, CapacitacionDocente, ExperienciaDiseno, ExperienciaProfesional, FormacionAcademica, LogroProfesional, ParticipacionOrganizaciones, PremioDistincion, Profesor, ProfesorCurso
+from gestion_de_profesores.models import ActualizacionDisciplinar, CapacitacionDocente, ExperienciaDiseno, ExperienciaProfesional, FormacionAcademica, LogroProfesional, ParticipacionOrganizaciones, PremioDistincion, ProductoAcademico, Profesor, ProfesorCurso
 
 class ProfesorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,3 +61,9 @@ class ActualizacionDisciplinarSerializer(serializers.ModelSerializer):
         model = ActualizacionDisciplinar
         fields = ['actualizacion_id', 'profesor_id', 'nombre_curso', 'institucion', 'pais', 'anio_obtencion', 'horas']
         read_only_fields = ['actualizacion_id']
+
+class ProductoAcademicoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductoAcademico
+        fields = ['producto_id', 'profesor_id', 'descripcion', 'anio', 'tipo', 'detalles']
+        read_only_fields = ['producto_id']

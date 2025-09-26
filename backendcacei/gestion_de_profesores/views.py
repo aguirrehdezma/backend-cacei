@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from gestion_de_profesores.models import ActualizacionDisciplinar, CapacitacionDocente, ExperienciaDiseno, ExperienciaProfesional, FormacionAcademica, LogroProfesional, ParticipacionOrganizaciones, PremioDistincion, Profesor, ProfesorCurso
-from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProfesorCursoSerializer, ProfesorSerializer
+from gestion_de_profesores.models import ActualizacionDisciplinar, CapacitacionDocente, ExperienciaDiseno, ExperienciaProfesional, FormacionAcademica, LogroProfesional, ParticipacionOrganizaciones, PremioDistincion, ProductoAcademico, Profesor, ProfesorCurso
+from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer, ProfesorSerializer
 
 # Create your views here.
 class ProfesorViewSet(viewsets.ModelViewSet):
@@ -43,3 +43,7 @@ class CapacitacionDocenteViewSet(viewsets.ModelViewSet):
 class ActualizacionDisciplinarViewSet(viewsets.ModelViewSet):
     queryset = ActualizacionDisciplinar.objects.all()
     serializer_class = ActualizacionDisciplinarSerializer
+
+class ProductoAcademicoViewSet(viewsets.ModelViewSet):
+    queryset = ProductoAcademico.objects.all()
+    serializer_class = ProductoAcademicoSerializer
