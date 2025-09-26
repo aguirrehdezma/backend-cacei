@@ -1,10 +1,15 @@
 from rest_framework import generics
 
+from evaluacion_acreditacion.models import Hallazgo
 from gestion_de_profesores.models import Profesor
 
-from cedulas.serializers import CedulaCVSinteticoSerializer
+from cedulas.serializers import CedulaCVSinteticoSerializer, CedulaPlanMejoraSerializer
 
 # Create your views here.
-class CedulaCVProfesorView(generics.RetrieveAPIView):
+class CedulaCVSinteticoView(generics.RetrieveAPIView):
     queryset = Profesor.objects.all()
     serializer_class = CedulaCVSinteticoSerializer
+
+class CedulaPlanMejoraView(generics.RetrieveAPIView):
+    queryset = Hallazgo.objects.all()
+    serializer_class = CedulaPlanMejoraSerializer

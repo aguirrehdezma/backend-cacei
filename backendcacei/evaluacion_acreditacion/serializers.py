@@ -5,7 +5,7 @@ from evaluacion_acreditacion.models import AccionMejora, AportacionPE, Evaluacio
 class AccionMejoraSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccionMejora
-        fields = ['accion_id', 'descripcion', 'resultado_esperado', 'meta', 'fecha_meta', 'responsable', 'estatus']
+        fields = ['accion_id', 'hallazgo_id', 'descripcion', 'resultado_esperado', 'meta', 'fecha_meta', 'responsable', 'estatus']
         read_only_fields = ['accion_id']
 
 class IndicadorSerializer(serializers.ModelSerializer):
@@ -35,7 +35,7 @@ class GestionAcademicaSerializer(serializers.ModelSerializer):
 class HallazgoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hallazgo
-        fields = ['hallazgo_id', 'numero_hallazgo', 'descripcion', 'objetivo_id', 'atributo_pe_id', 'es_indice_rendimiento', 'indicador_mr2025']
+        fields = ['hallazgo_id', 'programa_id', 'numero_hallazgo', 'descripcion', 'objetivo_id', 'atributo_pe_id', 'es_indice_rendimiento', 'indicador_mr2025']
         read_only_fields = ['hallazgo_id']
 
 class AuditoriaSerializer(serializers.ModelSerializer):

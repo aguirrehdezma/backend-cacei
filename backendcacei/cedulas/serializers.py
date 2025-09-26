@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-from evaluacion_acreditacion.serializers import AportacionPESerializer, GestionAcademicaSerializer
+from gestion_academica.serializers import AtributoPESerializer, ObjetivoEducacionalSerializer
+from evaluacion_acreditacion.models import Hallazgo
+from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer
 from gestion_de_profesores.models import Profesor
 
@@ -35,3 +37,15 @@ class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
             today = date.today()
             return today.year - obj.fecha_nacimiento.year - ((today.month, today.day) < (obj.fecha_nacimiento.month, obj.fecha_nacimiento.day))
         return None
+
+class CedulaPlanMejoraSerializer(serializers.ModelSerializer):
+    objetivo = ObjetivoEducacionalSerializer(read_only=True, source='objetivo_id')
+    atributo_pe = AtributoPESerializer(read_only=True, source='atributo_pe_id')
+    acciones_mejora = AccionMejoraSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Hallazgo
+        fields = [
+            "numero_hallazgo", "descripcion", "es_indice_rendimiento", "indicador_mr2025",
+            "objetivo", "atributo_pe", "acciones_mejora"
+        ]
