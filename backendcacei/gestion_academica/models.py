@@ -49,6 +49,46 @@ class CriterioDesempeno(models.Model):
     def __str__(self):
         return self.codigo
 
+class ObjetivoEducacional(models.Model):
+    objetivo_id = models.AutoField(primary_key=True)
+    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='objetivos_educacionales', db_column='programa_id')
+    codigo = models.CharField(max_length=10, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.codigo
+
+class AtributoPE(models.Model):
+    atributo_pe_id = models.AutoField(primary_key=True)
+    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='atributos_pe', db_column='programa_id')
+    codigo = models.CharField(max_length=10, unique=True)
+    nombre = models.CharField(max_length=100)
+    nombre_abreviado = models.CharField(max_length=50)
+    descripcion = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objetivos_educacionales = models.ManyToManyField(ObjetivoEducacional, through='AtributoPEObjetivo')
+    atributos_cacei = models.ManyToManyField('AtributoCACEI', through='AtributoPECACEI')
+    
+    def __str__(self):
+        return self.codigo
+
+class EjeConocimiento(models.Model):
+    eje_id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=50, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.nombre
+
 class Curso(models.Model):
     OBLIGATORIO = 'obligatorio'
     OPTATIVO = 'optativo'
@@ -67,9 +107,12 @@ class Curso(models.Model):
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=OBLIGATORIO)
     horas_totales = models.IntegerField()
     objetivo_general = models.TextField(blank=True, null=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    atributos_pe = models.ManyToManyField(AtributoPE, through='CursoAtributoPE')
+    ejes_conocimiento = models.ManyToManyField(EjeConocimiento, through='CursoEje')
 
     def __str__(self):
         return self.nombre
@@ -97,18 +140,6 @@ class EstrategiaEvaluacion(models.Model):
     
     def __str__(self):
         return str(self.numero)
-
-class ObjetivoEducacional(models.Model):
-    objetivo_id = models.AutoField(primary_key=True)
-    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='objetivos_educacionales', db_column='programa_id')
-    codigo = models.CharField(max_length=10, unique=True)
-    descripcion = models.TextField(blank=True, null=True)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return self.codigo
 
 class Bibliografia(models.Model):
     bibliografia_id = models.AutoField(primary_key=True)
@@ -143,17 +174,6 @@ class HorasSemana(models.Model):
     def __str__(self):
         return f"Horas Totales: {self.horas_totales}"
 
-class EjeConocimiento(models.Model):
-    eje_id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=50, unique=True)
-    descripcion = models.TextField(blank=True, null=True)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return self.nombre
-
 class ObjetivoEspecifico(models.Model):
     objetivo_id = models.AutoField(primary_key=True)
     curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='objetivos_especificos', db_column='curso_id')
@@ -165,20 +185,6 @@ class ObjetivoEspecifico(models.Model):
     
     def __str__(self):
         return str(self.objetivo_id)
-
-class AtributoPE(models.Model):
-    atributo_pe_id = models.AutoField(primary_key=True)
-    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='atributos_pe', db_column='programa_id')
-    codigo = models.CharField(max_length=10, unique=True)
-    nombre = models.CharField(max_length=100)
-    nombre_abreviado = models.CharField(max_length=50)
-    descripcion = models.TextField(blank=True, null=True)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return self.codigo
 
 class AtributoCACEI(models.Model):
     atributo_cacei_id = models.AutoField(primary_key=True)
@@ -192,3 +198,39 @@ class AtributoCACEI(models.Model):
     
     def __str__(self):
         return self.codigo
+
+class CursoAtributoPE(models.Model):
+    curso_atributo_pe_id = models.AutoField(primary_key=True)
+    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='curso_atributo_pe', db_column='curso_id')
+    atributo_pe_id = models.ForeignKey(AtributoPE, on_delete=models.PROTECT, related_name='curso_atributo_pe', db_column='atributo_pe_id')
+    nivel_aporte = models.CharField(max_length=1, choices=[('I', 'Introductorio'), ('M', 'Medio'), ('A', 'Avanzado')], default='I')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CursoEje(models.Model):
+    curso_eje_id = models.AutoField(primary_key=True)
+    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='curso_eje', db_column='curso_id')
+    eje_id = models.ForeignKey(EjeConocimiento, on_delete=models.PROTECT, related_name='curso_eje', db_column='eje_id')
+    horas = models.PositiveSmallIntegerField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AtributoPEObjetivo(models.Model):
+    atributo_pe_objetivo_id = models.AutoField(primary_key=True)
+    atributo_pe_id = models.ForeignKey(AtributoPE, on_delete=models.PROTECT, related_name='atributo_pe_objetivo', db_column='atributo_pe_id')
+    objetivo_id = models.ForeignKey(ObjetivoEducacional, on_delete=models.PROTECT, related_name='atributo_pe_objetivo', db_column='objetivo_id')
+    justificacion = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AtributoPECACEI(models.Model):
+    atributo_pe_cacei_id = models.AutoField(primary_key=True)
+    atributo_pe_id = models.ForeignKey(AtributoPE, on_delete=models.PROTECT, related_name='atributo_pe_cacei', db_column='atributo_pe_id')
+    atributo_cacei_id = models.ForeignKey(AtributoCACEI, on_delete=models.PROTECT, related_name='atributo_pe_cacei', db_column='atributo_cacei_id')
+    justificacion = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
