@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from gestion_academica.views import AtributoCACEIViewSet, AtributoPEViewSet, BibliografiaViewSet, CriterioDesempenoViewSet, CursoViewSet, EjeConocimientoViewSet, EstrategiaEnsenanzaViewSet, EstrategiaEvaluacionViewSet, HorasSemanaViewSet, ObjetivoEducacionalViewSet, ObjetivoEspecificoViewSet, ProgramaEducativoViewSet, UnidadTematicaViewSet
+from gestion_academica.views import AtributoCACEIViewSet, AtributoPECACEIViewSet, AtributoPEObjetivoViewSet, AtributoPEViewSet, BibliografiaViewSet, CriterioDesempenoViewSet, CursoAtributoPEViewSet, CursoEjeViewSet, CursoViewSet, EjeConocimientoViewSet, EstrategiaEnsenanzaViewSet, EstrategiaEvaluacionViewSet, HorasSemanaViewSet, ObjetivoEducacionalViewSet, ObjetivoEspecificoViewSet, ProgramaEducativoViewSet, UnidadTematicaViewSet
 
 router = routers.SimpleRouter()
 router.register(r'programas_educativos', ProgramaEducativoViewSet, basename='programa-educativo')
@@ -16,4 +16,8 @@ router.register(r'ejes_conocimiento', EjeConocimientoViewSet, basename='eje-cono
 router.register(r'objetivos_especificos', ObjetivoEspecificoViewSet, basename='objetivo-especifico')
 router.register(r'atributos_pe', AtributoPEViewSet, basename='atributo-pe')
 router.register(r'atributos_cacei', AtributoCACEIViewSet, basename='atributo-cacei')
+router.register(r'cursos_atributos_pe', CursoAtributoPEViewSet, basename='curso-atributo-pe')
+router.register(r'cursos_ejes', CursoEjeViewSet, basename='curso-eje')
+router.register(r'atributos_pe_objetivos', AtributoPEObjetivoViewSet, basename='atributo-pe-objetivo')
+router.register(r'atributos_pe_cacei', AtributoPECACEIViewSet, basename='atributo-pe-cacei')
 urlpatterns = router.urls

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from gestion_academica.models import AtributoCACEI, AtributoPE, Bibliografia, CriterioDesempeno, Curso, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, ProgramaEducativo, UnidadTematica
+from gestion_academica.models import AtributoCACEI, AtributoPE, AtributoPEObjetivo, Bibliografia, CriterioDesempeno, Curso, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, ProgramaEducativo, UnidadTematica
 
 class ProgramaEducativoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -79,3 +79,27 @@ class AtributoCACEISerializer(serializers.ModelSerializer):
         model = AtributoCACEI
         fields = ['atributo_cacei_id', 'codigo', 'nombre', 'descripcion', 'wk_referencia']
         read_only_fields = ['atributo_cacei_id']
+
+class CursoAtributoPESerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CursoAtributoPE
+        fields = ['curso_atributo_pe_id', 'curso_id', 'atributo_pe_id', 'nivel_aporte']
+        read_only_fields = ['curso_atributo_pe_id']
+
+class CursoEjeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CursoEje
+        fields = ['curso_eje_id', 'curso_id', 'eje_id', 'horas']
+        read_only_fields = ['curso_eje_id']
+
+class AtributoPEObjetivoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AtributoPEObjetivo
+        fields = ['atributo_pe_objetivo_id', 'atributo_pe_id', 'objetivo_id', 'justificacion']
+        read_only_fields = ['atributo_pe_objetivo_id']
+
+class AtributoPECACEISerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AtributoPE
+        fields = ['atributo_pe_cacei_id', 'atributo_pe_id', 'atributo_cacei_id', 'justificacion']
+        read_only_fields = ['atributo_pe_cacei_id']
