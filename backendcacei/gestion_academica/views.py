@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from gestion_academica.models import AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, UnidadTematica
-from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, CursoEjeSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, UnidadTematicaSerializer
+from gestion_academica.models import AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, Practica, UnidadTematica
+from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, CursoEjeSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, PracticaSerializer, UnidadTematicaSerializer
 
 # Create your views here.
 class UnidadTematicaViewSet(viewsets.ModelViewSet):
@@ -63,3 +63,7 @@ class AtributoPEObjetivoViewSet(viewsets.ModelViewSet):
 class AtributoPECACEIViewSet(viewsets.ModelViewSet):
     queryset = AtributoPECACEI.objects.all()
     serializer_class = AtributoPECACEISerializer
+
+class PracticaViewSet(viewsets.ModelViewSet):
+    queryset = Practica.objects.all()
+    serializer_class = PracticaSerializer
