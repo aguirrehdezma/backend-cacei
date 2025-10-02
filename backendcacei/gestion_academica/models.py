@@ -1,33 +1,9 @@
 from django.db import models
 
 # Create your models here.
-class ProgramaEducativo(models.Model):
-    ACTIVO = 'activo'
-    INACTIVO = 'inactivo'
-    EN_REVISION = 'en_revision'
-
-    ESTATUS_CHOICES = [
-        (ACTIVO, 'Activo'),
-        (INACTIVO, 'Inactivo'),
-        (EN_REVISION, 'En Revisión'),
-    ]
-
-    programa_id = models.AutoField(primary_key=True)
-    clave = models.CharField(max_length=20, unique=True)
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(blank=True, null=True)
-    fecha_creacion = models.DateField(auto_now_add=True)
-    estatus = models.CharField(max_length=20, choices=ESTATUS_CHOICES, default=ACTIVO)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.nombre
-
 class UnidadTematica(models.Model):
     unidad_id = models.AutoField(primary_key=True)
-    curso_id = models.ForeignKey('Curso', on_delete=models.PROTECT, related_name='unidades_tematicas', db_column='curso_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='unidades_tematicas', db_column='curso_id')
     numero = models.IntegerField(unique=True)
     descripcion = models.TextField(blank=True, null=True)
     
@@ -37,21 +13,9 @@ class UnidadTematica(models.Model):
     def __str__(self):
         return str(self.numero)
 
-class CriterioDesempeno(models.Model):
-    criterio_id = models.AutoField(primary_key=True)
-    atributo_pe_id = models.ForeignKey('AtributoPE', on_delete=models.PROTECT, related_name='criterios_desempeno', db_column='atributo_pe_id')
-    codigo = models.CharField(max_length=10, unique=True)
-    descripcion = models.TextField(blank=True, null=True)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return self.codigo
-
 class ObjetivoEducacional(models.Model):
     objetivo_id = models.AutoField(primary_key=True)
-    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='objetivos_educacionales', db_column='programa_id')
+    programa_id = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, related_name='objetivos_educacionales', db_column='programa_id')
     codigo = models.CharField(max_length=10, unique=True)
     descripcion = models.TextField(blank=True, null=True)
     
@@ -63,7 +27,7 @@ class ObjetivoEducacional(models.Model):
 
 class AtributoPE(models.Model):
     atributo_pe_id = models.AutoField(primary_key=True)
-    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='atributos_pe', db_column='programa_id')
+    programa_id = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, related_name='atributos_pe', db_column='programa_id')
     codigo = models.CharField(max_length=10, unique=True)
     nombre = models.CharField(max_length=100)
     nombre_abreviado = models.CharField(max_length=50)
@@ -71,9 +35,18 @@ class AtributoPE(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.codigo
 
-    objetivos_educacionales = models.ManyToManyField(ObjetivoEducacional, through='AtributoPEObjetivo')
-    atributos_cacei = models.ManyToManyField('AtributoCACEI', through='AtributoPECACEI')
+class CriterioDesempeno(models.Model):
+    criterio_id = models.AutoField(primary_key=True)
+    atributo_pe_id = models.ForeignKey(AtributoPE, on_delete=models.PROTECT, related_name='criterios_desempeno', db_column='atributo_pe_id')
+    codigo = models.CharField(max_length=10, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.codigo
@@ -89,37 +62,9 @@ class EjeConocimiento(models.Model):
     def __str__(self):
         return self.nombre
 
-class Curso(models.Model):
-    OBLIGATORIO = 'obligatorio'
-    OPTATIVO = 'optativo'
-
-    TIPO_CHOICES = [
-        (OBLIGATORIO, 'Obligatorio'),
-        (OPTATIVO, 'Optativo'),
-    ]
-    
-    curso_id = models.AutoField(primary_key=True)
-    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='cursos', db_column='programa_id')
-    clave = models.CharField(max_length=20, unique=True)
-    nombre = models.CharField(max_length=100)
-    seriacion = models.TextField(blank=True, null=True)
-    ubicacion = models.CharField(max_length=50)
-    tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=OBLIGATORIO)
-    horas_totales = models.IntegerField()
-    objetivo_general = models.TextField(blank=True, null=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    atributos_pe = models.ManyToManyField(AtributoPE, through='CursoAtributoPE')
-    ejes_conocimiento = models.ManyToManyField(EjeConocimiento, through='CursoEje')
-
-    def __str__(self):
-        return self.nombre
-
 class EstrategiaEnsenanza(models.Model):
     estrategia_id = models.AutoField(primary_key=True)
-    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='estrategias_ensenanza', db_column='curso_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='estrategias_ensenanza', db_column='curso_id')
     numero = models.IntegerField()
     descripcion = models.TextField(blank=True, null=True)
     
@@ -131,7 +76,7 @@ class EstrategiaEnsenanza(models.Model):
 
 class EstrategiaEvaluacion(models.Model):
     estrategia_id = models.AutoField(primary_key=True)
-    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='estrategias_evaluacion', db_column='curso_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='estrategias_evaluacion', db_column='curso_id')
     numero = models.IntegerField()
     descripcion = models.TextField(blank=True, null=True)
     
@@ -143,7 +88,7 @@ class EstrategiaEvaluacion(models.Model):
 
 class Bibliografia(models.Model):
     bibliografia_id = models.AutoField(primary_key=True)
-    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='bibliografias', db_column='curso_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='bibliografias', db_column='curso_id')
     numero = models.IntegerField()
     autor = models.CharField(max_length=100)
     titulo = models.CharField(max_length=200)
@@ -158,7 +103,7 @@ class Bibliografia(models.Model):
 
 class HorasSemana(models.Model):
     horas_id = models.AutoField(primary_key=True)
-    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='horas_semana', db_column='curso_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='horas_semana', db_column='curso_id')
     horas_totales = models.PositiveSmallIntegerField()
     horas_aula = models.PositiveSmallIntegerField()
     horas_laboratorio = models.PositiveSmallIntegerField()
@@ -176,7 +121,7 @@ class HorasSemana(models.Model):
 
 class ObjetivoEspecifico(models.Model):
     objetivo_id = models.AutoField(primary_key=True)
-    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='objetivos_especificos', db_column='curso_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='objetivos_especificos', db_column='curso_id')
     descripcion = models.TextField(blank=True, null=True)
     orden = models.IntegerField()
     
@@ -201,7 +146,7 @@ class AtributoCACEI(models.Model):
 
 class CursoAtributoPE(models.Model):
     curso_atributo_pe_id = models.AutoField(primary_key=True)
-    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='curso_atributo_pe', db_column='curso_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='curso_atributo_pe', db_column='curso_id')
     atributo_pe_id = models.ForeignKey(AtributoPE, on_delete=models.PROTECT, related_name='curso_atributo_pe', db_column='atributo_pe_id')
     nivel_aporte = models.CharField(max_length=1, choices=[('I', 'Introductorio'), ('M', 'Medio'), ('A', 'Avanzado')], default='I')
 
@@ -210,7 +155,7 @@ class CursoAtributoPE(models.Model):
 
 class CursoEje(models.Model):
     curso_eje_id = models.AutoField(primary_key=True)
-    curso_id = models.ForeignKey(Curso, on_delete=models.PROTECT, related_name='curso_eje', db_column='curso_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='curso_eje', db_column='curso_id')
     eje_id = models.ForeignKey(EjeConocimiento, on_delete=models.PROTECT, related_name='curso_eje', db_column='eje_id')
     horas = models.PositiveSmallIntegerField()
 

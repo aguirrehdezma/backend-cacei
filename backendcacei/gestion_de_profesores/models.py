@@ -1,23 +1,6 @@
 from django.db import models
 
 # Create your models here.
-class Profesor(models.Model):
-    profesor_id = models.AutoField(primary_key=True)
-    numero_empleado = models.CharField(max_length=20, unique=True)
-    apellido_paterno = models.CharField(max_length=50)
-    apellido_materno = models.CharField(max_length=50)
-    nombres = models.CharField(max_length=100)
-    fecha_nacimiento = models.DateField()
-    nombramiento_actual = models.CharField(max_length=100)
-    antiguedad = models.PositiveSmallIntegerField()
-    experiencia_ingenieria = models.BooleanField(default=False)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Profesor: {self.nombres} - {self.apellido_paterno} - {self.apellido_materno}"
-
 class ProfesorCurso(models.Model):
     RESPONSABLE = 'responsable'
     INSTRUCTOR = 'instructor'
@@ -28,8 +11,8 @@ class ProfesorCurso(models.Model):
     ]
 
     profesor_curso_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='cursos', db_column='profesor_id')
-    curso_id = models.ForeignKey('gestion_academica.Curso', on_delete=models.PROTECT, related_name='profesores', db_column='curso_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='cursos', db_column='profesor_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='profesores', db_column='curso_id')
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=RESPONSABLE)
     periodo = models.CharField(max_length=50)
     
@@ -53,7 +36,7 @@ class FormacionAcademica(models.Model):
     ]
 
     formacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='formacion_academica', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='formacion_academica', db_column='profesor_id')
     nivel = models.CharField(max_length=20, choices=NIVEL_CHOICES, default=LICENCIATURA)
     institucion = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
@@ -69,7 +52,7 @@ class FormacionAcademica(models.Model):
 
 class ExperienciaProfesional(models.Model):
     experiencia_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='experiencia_profesional', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='experiencia_profesional', db_column='profesor_id')
     organizacion = models.CharField(max_length=100)
     puesto = models.CharField(max_length=100)
     fecha_inicio = models.DateField()
@@ -84,7 +67,7 @@ class ExperienciaProfesional(models.Model):
 
 class ExperienciaDiseno(models.Model):
     diseno_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='experiencia_disenio', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='experiencia_disenio', db_column='profesor_id')
     organizacion = models.CharField(max_length=100)
     periodo = models.CharField(max_length=50)
     nivel_experiencia = models.CharField(max_length=50)
@@ -98,7 +81,7 @@ class ExperienciaDiseno(models.Model):
 
 class LogroProfesional(models.Model):
     logro_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='logros_profesionales', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='logros_profesionales', db_column='profesor_id')
     descripcion = models.TextField()
     anio = models.PositiveSmallIntegerField(null=True, blank=True)
     relevancia = models.TextField(null=True, blank=True)
@@ -111,7 +94,7 @@ class LogroProfesional(models.Model):
 
 class PremioDistincion(models.Model):
     premio_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='premios_distinciones', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='premios_distinciones', db_column='profesor_id')
     descripcion = models.TextField()
     anio = models.PositiveSmallIntegerField(null=True, blank=True)
     institucion_otorga = models.CharField(max_length=100, null=True, blank=True)
@@ -124,7 +107,7 @@ class PremioDistincion(models.Model):
 
 class ParticipacionOrganizaciones(models.Model):
     participacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='participaciones_organizaciones', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='participaciones_organizaciones', db_column='profesor_id')
     organizacion = models.CharField(max_length=100)
     periodo = models.CharField(max_length=50)
     nivel_participacion = models.CharField(max_length=50)
@@ -137,7 +120,7 @@ class ParticipacionOrganizaciones(models.Model):
 
 class CapacitacionDocente(models.Model):
     capacitacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='capacitacion_docente', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='capacitacion_docente', db_column='profesor_id')
     nombre_curso = models.CharField(max_length=100)
     institucion = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
@@ -152,7 +135,7 @@ class CapacitacionDocente(models.Model):
 
 class ActualizacionDisciplinar(models.Model):
     actualizacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='actualizacion_disciplinar', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='actualizacion_disciplinar', db_column='profesor_id')
     nombre_curso = models.CharField(max_length=100)
     institucion = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
@@ -179,7 +162,7 @@ class ProductoAcademico(models.Model):
     ]
     
     producto_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey(Profesor, on_delete=models.PROTECT, related_name='productos_academicos', db_column='profesor_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='productos_academicos', db_column='profesor_id')
     descripcion = models.TextField()
     anio = models.PositiveSmallIntegerField()
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=PUBLICACION)

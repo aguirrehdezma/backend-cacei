@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
+from core.models import Profesor
 from gestion_academica.serializers import AtributoPESerializer, ObjetivoEducacionalSerializer
 from evaluacion_acreditacion.models import Hallazgo
 from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer
-from gestion_de_profesores.models import Profesor
 
 class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
     formacion_academica = FormacionAcademicaSerializer(many=True, read_only=True)
@@ -22,7 +22,8 @@ class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profesor
-        fields = ["numero_empleado", 
+        fields = [
+            "numero_empleado", 
             "apellido_paterno", "apellido_materno", "nombres",
             "edad", "fecha_nacimiento", "nombramiento_actual", "antiguedad", 
             "formacion_academica", "capacitacion_docente", "actualizacion_disciplinar",

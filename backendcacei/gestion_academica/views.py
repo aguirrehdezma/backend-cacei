@@ -1,13 +1,9 @@
 from rest_framework import viewsets
 
-from gestion_academica.models import AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, CriterioDesempeno, Curso, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, ProgramaEducativo, UnidadTematica
-from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, CursoEjeSerializer, CursoSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, ProgramaEducativoSerializer, UnidadTematicaSerializer
+from gestion_academica.models import AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, UnidadTematica
+from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, CursoEjeSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, UnidadTematicaSerializer
 
 # Create your views here.
-class ProgramaEducativoViewSet(viewsets.ModelViewSet):
-    queryset = ProgramaEducativo.objects.all()
-    serializer_class = ProgramaEducativoSerializer
-    
 class UnidadTematicaViewSet(viewsets.ModelViewSet):
     queryset = UnidadTematica.objects.all()
     serializer_class = UnidadTematicaSerializer
@@ -15,10 +11,6 @@ class UnidadTematicaViewSet(viewsets.ModelViewSet):
 class CriterioDesempenoViewSet(viewsets.ModelViewSet):
     queryset = CriterioDesempeno.objects.all()
     serializer_class = CriterioDesempenoSerializer
-
-class CursoViewSet(viewsets.ModelViewSet):
-    queryset = Curso.objects.all()
-    serializer_class = CursoSerializer
 
 class EstrategiaEnsenanzaViewSet(viewsets.ModelViewSet):
     queryset = EstrategiaEnsenanza.objects.all()

@@ -1,7 +1,7 @@
 from rest_framework import generics
 
+from core.models import Profesor
 from evaluacion_acreditacion.models import Hallazgo
-from gestion_de_profesores.models import Profesor
 
 from cedulas.serializers import CedulaCVSinteticoSerializer, CedulaPlanMejoraSerializer
 

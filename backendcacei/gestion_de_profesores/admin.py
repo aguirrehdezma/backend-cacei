@@ -1,9 +1,8 @@
 from django.contrib import admin
 
-from gestion_de_profesores.models import ActualizacionDisciplinar, CapacitacionDocente, ExperienciaDiseno, ExperienciaProfesional, FormacionAcademica, LogroProfesional, ParticipacionOrganizaciones, PremioDistincion, ProductoAcademico, Profesor, ProfesorCurso
+from gestion_de_profesores.models import ActualizacionDisciplinar, CapacitacionDocente, ExperienciaDiseno, ExperienciaProfesional, FormacionAcademica, LogroProfesional, ParticipacionOrganizaciones, PremioDistincion, ProductoAcademico, ProfesorCurso
 
 # Register your models here.
-admin.site.register(Profesor)
 admin.site.register(ProfesorCurso)
 admin.site.register(FormacionAcademica)
 admin.site.register(ExperienciaProfesional)
