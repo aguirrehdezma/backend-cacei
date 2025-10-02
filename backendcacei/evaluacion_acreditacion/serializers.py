@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.serializers import CursoSerializer
 from evaluacion_acreditacion.models import AccionMejora, AportacionPE, EvaluacionIndicador, GestionAcademica, Hallazgo, Indicador, Auditoria
 
 class AccionMejoraSerializer(serializers.ModelSerializer):
@@ -8,28 +9,32 @@ class AccionMejoraSerializer(serializers.ModelSerializer):
         fields = ['accion_id', 'hallazgo_id', 'descripcion', 'resultado_esperado', 'meta', 'fecha_meta', 'responsable', 'estatus']
         read_only_fields = ['accion_id']
 
-class IndicadorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Indicador
-        fields = ['indicador_id', 'codigo', 'descripcion']
-        read_only_fields = ['indicador_id']
-
 class EvaluacionIndicadorSerializer(serializers.ModelSerializer):
+    curso = CursoSerializer(read_only=True, source='curso_id')
+    
     class Meta:
         model = EvaluacionIndicador
-        fields = ['evaluacion_id', 'grupo_seccion', 'instrumento_evaluacion', 'descripcion_instrumento', 'periodo_evaluacion', 'valoracion', 'analisis_resultados', 'meta']
-        read_only_fields = ['evaluacion_id']
+        fields = ['evaluacion_id', 'indicador_id', 'curso_id', 'grupo_seccion', 'instrumento_evaluacion', 'descripcion_instrumento', 'periodo_evaluacion', 'valoracion', 'analisis_resultados', 'meta', 'curso']
+        read_only_fields = ['evaluacion_id', 'curso']
+
+class IndicadorSerializer(serializers.ModelSerializer):
+    evaluaciones = EvaluacionIndicadorSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Indicador
+        fields = ['indicador_id', 'criterio_id', 'codigo', 'descripcion', 'evaluaciones']
+        read_only_fields = ['indicador_id']
 
 class AportacionPESerializer(serializers.ModelSerializer):
     class Meta:
         model = AportacionPE
-        fields = ['aportacion_id', 'descripcion']
+        fields = ['aportacion_id', 'profesor_id', 'descripcion']
         read_only_fields = ['aportacion_id']
 
 class GestionAcademicaSerializer(serializers.ModelSerializer):
     class Meta:
         model = GestionAcademica
-        fields = ['gestion_id', 'actividad', 'institucion', 'fecha_inicio', 'fecha_fin']
+        fields = ['gestion_id', 'profesor_id', 'actividad', 'institucion', 'fecha_inicio', 'fecha_fin']
         read_only_fields = ['gestion_id']
 
 class HallazgoSerializer(serializers.ModelSerializer):

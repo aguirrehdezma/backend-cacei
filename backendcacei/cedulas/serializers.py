@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
+from gestion_academica.models import AtributoPE
 from core.models import Profesor
-from gestion_academica.serializers import AtributoPESerializer, ObjetivoEducacionalSerializer
+from gestion_academica.serializers import AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer
 from evaluacion_acreditacion.models import Hallazgo
 from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer
@@ -49,4 +50,14 @@ class CedulaPlanMejoraSerializer(serializers.ModelSerializer):
         fields = [
             "numero_hallazgo", "descripcion", "es_indice_rendimiento", "indicador_mr2025",
             "objetivo", "atributo_pe", "acciones_mejora"
+        ]
+
+class CedulaHerramientasValoracionAEPSerializer(serializers.ModelSerializer):
+    criterios_desempeno = CriterioDesempenoSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = AtributoPE
+        fields = [
+            "descripcion", 
+            "criterios_desempeno"
         ]
