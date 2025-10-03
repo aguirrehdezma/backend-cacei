@@ -72,9 +72,11 @@ class AtributoCACEISerializer(serializers.ModelSerializer):
         read_only_fields = ['atributo_cacei_id']
 
 class CursoAtributoPESerializer(serializers.ModelSerializer):
+    atributo_pe = AtributoPESerializer(read_only=True, source='atributo_pe_id')
+
     class Meta:
         model = CursoAtributoPE
-        fields = ['curso_atributo_pe_id', 'curso_id', 'atributo_pe_id', 'nivel_aporte']
+        fields = ['curso_atributo_pe_id', 'curso_id', 'atributo_pe_id', 'nivel_aporte', 'atributo_pe']
         read_only_fields = ['curso_atributo_pe_id']
 
 class CursoEjeSerializer(serializers.ModelSerializer):

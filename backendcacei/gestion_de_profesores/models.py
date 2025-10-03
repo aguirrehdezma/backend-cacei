@@ -11,8 +11,8 @@ class ProfesorCurso(models.Model):
     ]
 
     profesor_curso_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='cursos', db_column='profesor_id')
-    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='profesores', db_column='curso_id')
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='profesores_cursos', db_column='profesor_id')
+    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='profesores_cursos', db_column='curso_id')
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=RESPONSABLE)
     periodo = models.CharField(max_length=50)
     

@@ -1,11 +1,13 @@
 from rest_framework import serializers
 
+from core.serializers import ProfesorSerializer
 from gestion_de_profesores.models import ActualizacionDisciplinar, CapacitacionDocente, ExperienciaDiseno, ExperienciaProfesional, FormacionAcademica, LogroProfesional, ParticipacionOrganizaciones, PremioDistincion, ProductoAcademico, ProfesorCurso
 
 class ProfesorCursoSerializer(serializers.ModelSerializer):
+    profesor = ProfesorSerializer(read_only=True, source='profesor_id')
     class Meta:
         model = ProfesorCurso
-        fields = ['profesor_curso_id', 'profesor_id', 'curso_id', 'tipo', 'periodo']
+        fields = ['profesor_curso_id', 'profesor_id', 'curso_id', 'tipo', 'periodo', 'profesor']
         read_only_fields = ['profesor_curso_id']
 
 class FormacionAcademicaSerializer(serializers.ModelSerializer):
