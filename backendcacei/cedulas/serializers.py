@@ -2,10 +2,10 @@ from rest_framework import serializers
 
 from gestion_academica.models import AtributoPE, ObjetivoEducacional
 from core.models import Profesor, Curso
-from gestion_academica.serializers import AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer, CursoAtributoPESerializer, HorasSemanaSerializer, UnidadTematicaSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, PracticaSerializer, BibliografiaSerializer
+from gestion_academica.serializers import AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer, CursoAtributoPESerializer, HorasSemanaSerializer, UnidadTematicaSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, PracticaSerializer, BibliografiaSerializer
 from evaluacion_acreditacion.models import Hallazgo
 from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer
-from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProfesorCursoSerializer
+from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer
 
 
 class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
@@ -13,6 +13,7 @@ class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
     capacitacion_docente = CapacitacionDocenteSerializer(many=True, read_only=True)
     actualizacion_disciplinar = ActualizacionDisciplinarSerializer(many=True, read_only=True)
     gestion_academica = GestionAcademicaSerializer(many=True, read_only=True)
+    producto_academico = ProductoAcademicoSerializer(many=True, read_only=True)
     experiencia_profesional = ExperienciaProfesionalSerializer(many=True, read_only=True)
     experiencia_diseno = ExperienciaDisenoSerializer(many=True, read_only=True)
     logros_profesionales = LogroProfesionalSerializer(many=True, read_only=True)
@@ -29,7 +30,7 @@ class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
             "apellido_paterno", "apellido_materno", "nombres",
             "edad", "fecha_nacimiento", "nombramiento_actual", "antiguedad", 
             "formacion_academica", "capacitacion_docente", "actualizacion_disciplinar",
-            "gestion_academica", "experiencia_profesional", "experiencia_diseno",
+            "gestion_academica", "producto_academico", "experiencia_profesional", "experiencia_diseno",
             "logros_profesionales", "participaciones_organizaciones", "premios_distinciones",
             "aportaciones_pe"
         ]
@@ -63,7 +64,7 @@ class CedulaHerramientasValoracionAEPSerializer(serializers.ModelSerializer):
             "criterios_desempeno"
         ]
 
-class CedulaProgramacursoasignaturaSerializer(serializers.ModelSerializer):
+class CedulaProgramaAsignaturaSerializer(serializers.ModelSerializer):
     curso_atributo_pe = CursoAtributoPESerializer(many=True, read_only=True)
     horas_semana = HorasSemanaSerializer(many=True, read_only=True)
     unidades_tematicas = UnidadTematicaSerializer(many=True, read_only=True)
@@ -72,6 +73,7 @@ class CedulaProgramacursoasignaturaSerializer(serializers.ModelSerializer):
     practicas = PracticaSerializer(many=True, read_only=True)
     bibliografias = BibliografiaSerializer(many=True, read_only=True)
     profesores_cursos = ProfesorCursoSerializer(many=True, read_only=True)
+
     class Meta:
         model = Curso
         fields = [
@@ -86,15 +88,12 @@ class CedulaProgramacursoasignaturaSerializer(serializers.ModelSerializer):
             "profesores_cursos"
         ]
 
-
-class CedulaValoracionObjetivosSerializer(serializers.ModelSerializer):
-    criterios_desempeno = CriterioDesempenoSerializer(many=True, read_only=True)
-    objetivo_educacional = ObjetivoEducacionalSerializer(read_only=True, source='objetivo_id')
+class CedulaValoracionOEPESerializer(serializers.ModelSerializer):
+    atributo_pe_objetivo = AtributoPEObjetivoSerializer(many=True, read_only=True)
     
     class Meta:
         model = ObjetivoEducacional
         fields = [
-            "objetivo_educacional"
-            
-
+            "descripcion",
+            "atributo_pe_objetivo",
         ]

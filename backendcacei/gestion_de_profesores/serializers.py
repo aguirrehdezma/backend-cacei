@@ -5,6 +5,7 @@ from gestion_de_profesores.models import ActualizacionDisciplinar, CapacitacionD
 
 class ProfesorCursoSerializer(serializers.ModelSerializer):
     profesor = ProfesorSerializer(read_only=True, source='profesor_id')
+    
     class Meta:
         model = ProfesorCurso
         fields = ['profesor_curso_id', 'profesor_id', 'curso_id', 'tipo', 'periodo', 'profesor']
