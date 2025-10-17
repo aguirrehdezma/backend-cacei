@@ -1,6 +1,6 @@
 from django.urls import path
 
-from cedulas.views import CedulaCVSinteticoView, CedulaCursosVsAEPView, CedulaHerramientasValoracionAEPView, CedulaPlanMejoraView, CedulaProgramaAsignaturaView, CedulaValoracionOEPEView, CedulaOrganizacionCurricularView
+from cedulas.views import CedulaAEPVsAECACEIView, CedulaCVSinteticoView, CedulaCursosVsAEPView, CedulaHerramientasValoracionAEPView, CedulaPlanMejoraView, CedulaProgramaAsignaturaView, CedulaValoracionOEPEView, CedulaOrganizacionCurricularView
 
 urlpatterns = [
     path("profesores/<int:pk>/cv/", CedulaCVSinteticoView.as_view(), name="cedula-cv-sintetico"),
@@ -10,4 +10,5 @@ urlpatterns = [
     path("objetivos_educacionales/<int:pk>/valoracion_objetivos/", CedulaValoracionOEPEView.as_view(), name="cedula-valoracion-objetivos"),
     path("programas_educativos/<int:pk>/organizacion_curricular/", CedulaOrganizacionCurricularView.as_view(), name="cedula-organizacion-curricular"),
     path("programas_educativos/<int:pk>/cursos_vs_aep/", CedulaCursosVsAEPView.as_view(), name="cedula-cursos-vs-aep"),
+    path("programas_educativos/<int:pk>/aep_vs_aecacei/", CedulaAEPVsAECACEIView.as_view(), name="cedula-aep-vs-aecacei"),
 ]

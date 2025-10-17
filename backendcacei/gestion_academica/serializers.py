@@ -59,17 +59,27 @@ class ObjetivoEspecificoSerializer(serializers.ModelSerializer):
         fields = ['objetivo_id', 'curso_id', 'descripcion', 'orden']
         read_only_fields = ['objetivo_id']
 
-class AtributoPESerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AtributoPE
-        fields = ['atributo_pe_id', 'programa_id', 'codigo', 'nombre', 'nombre_abreviado', 'descripcion']
-        read_only_fields = ['atributo_pe_id']
-
 class AtributoCACEISerializer(serializers.ModelSerializer):
     class Meta:
         model = AtributoCACEI
         fields = ['atributo_cacei_id', 'codigo', 'nombre', 'descripcion', 'wk_referencia']
         read_only_fields = ['atributo_cacei_id']
+
+class AtributoPECACEISerializer(serializers.ModelSerializer):
+    atributo_cacei = AtributoCACEISerializer(read_only=True, source='atributo_cacei_id')
+
+    class Meta:
+        model = AtributoPECACEI
+        fields = ['atributo_pe_cacei_id', 'atributo_pe_id', 'atributo_cacei_id', 'justificacion', 'atributo_cacei']
+        read_only_fields = ['atributo_pe_cacei_id']
+
+class AtributoPESerializer(serializers.ModelSerializer):
+    atributo_pe_cacei = AtributoPECACEISerializer(many=True, read_only=True)
+
+    class Meta:
+        model = AtributoPE
+        fields = ['atributo_pe_id', 'programa_id', 'codigo', 'nombre', 'nombre_abreviado', 'descripcion', 'atributo_pe_cacei']
+        read_only_fields = ['atributo_pe_id']
 
 class CursoAtributoPESerializer(serializers.ModelSerializer):
     atributo_pe = AtributoPESerializer(read_only=True, source='atributo_pe_id')
@@ -96,12 +106,6 @@ class AtributoPEObjetivoSerializer(serializers.ModelSerializer):
     def get_valoracion_aep(self, obj):
         from cedulas.serializers import CedulaHerramientasValoracionAEPSerializer  
         return CedulaHerramientasValoracionAEPSerializer(obj.atributo_pe_id).data
-
-class AtributoPECACEISerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AtributoPECACEI
-        fields = ['atributo_pe_cacei_id', 'atributo_pe_id', 'atributo_cacei_id', 'justificacion']
-        read_only_fields = ['atributo_pe_cacei_id']
 
 class PracticaSerializer(serializers.ModelSerializer):
     class Meta:
