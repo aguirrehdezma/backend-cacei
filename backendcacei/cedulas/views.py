@@ -1,12 +1,12 @@
 from rest_framework import generics
 
 from gestion_academica.models import AtributoPE, ObjetivoEducacional
-from core.models import Profesor, Curso
+from core.models import Profesor, Curso, ProgramaEducativo
 from evaluacion_acreditacion.models import Hallazgo
 
 
 
-from cedulas.serializers import CedulaCVSinteticoSerializer, CedulaHerramientasValoracionAEPSerializer, CedulaPlanMejoraSerializer, CedulaProgramacursoasignaturaSerializer, CedulaValoracionObjetivosSerializer
+from cedulas.serializers import CedulaCVSinteticoSerializer, CedulaHerramientasValoracionAEPSerializer, CedulaPlanMejoraSerializer, CedulaProgramacursoasignaturaSerializer, CedulaValoracionObjetivosSerializer, CedulaOrganizacionCurricularSerializer
 
 # Create your views here.
 class CedulaCVSinteticoView(generics.RetrieveAPIView):
@@ -29,3 +29,10 @@ class CedulaProgramacursoasignaturaView(generics.RetrieveAPIView):
 class CedulaValoracionObjetivosView(generics.RetrieveAPIView):
     queryset = ObjetivoEducacional.objects.all()
     serializer_class = CedulaValoracionObjetivosSerializer
+
+class CedulaOrganizacionCurricularView(generics.ListAPIView):
+    queryset = ProgramaEducativo.objects.all()
+    serializer_class = CedulaOrganizacionCurricularSerializer
+
+        
+        

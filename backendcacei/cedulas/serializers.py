@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
 from gestion_academica.models import AtributoPE, ObjetivoEducacional
-from core.models import Profesor, Curso
+from core.models import Profesor, Curso, ProgramaEducativo
 from gestion_academica.serializers import AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer, CursoAtributoPESerializer, HorasSemanaSerializer, UnidadTematicaSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, PracticaSerializer, BibliografiaSerializer
 from evaluacion_acreditacion.models import Hallazgo
-from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer
-from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProfesorCursoSerializer
+from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer 
+from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProfesorCursoSerializer 
+from core.serializers import CursoSerializer
 
 
 class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
@@ -90,11 +91,28 @@ class CedulaProgramacursoasignaturaSerializer(serializers.ModelSerializer):
 class CedulaValoracionObjetivosSerializer(serializers.ModelSerializer):
     criterios_desempeno = CriterioDesempenoSerializer(many=True, read_only=True)
     objetivo_educacional = ObjetivoEducacionalSerializer(read_only=True, source='objetivo_id')
+    programa_educativo = GestionAcademicaSerializer(read_only=True, source='programa_educativo_id')
+    indicadores = serializers.SerializerMethodField()
+    evaluaciones_indicadores = serializers.SerializerMethodField()
+
     
     class Meta:
         model = ObjetivoEducacional
         fields = [
-            "objetivo_educacional"
-            
+            "objetivo_educacional",
+            "programa_educativo",
+            "criterios_desempeno",
+            "indicadores",
+            "evaluaciones_indicadores"
+        ]
+
+
+class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
+    cursos = CursoSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProgramaEducativo
+        fields = [
+            "cursos"
 
         ]
