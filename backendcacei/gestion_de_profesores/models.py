@@ -37,8 +37,8 @@ class FormacionAcademica(models.Model):
 
     formacion_id = models.AutoField(primary_key=True)
     profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='formacion_academica', db_column='profesor_id')
+    institucion_id = models.ForeignKey('core.Institucion', on_delete=models.PROTECT, related_name='formacion_academica', db_column='institucion_id')
     nivel = models.CharField(max_length=20, choices=NIVEL_CHOICES, default=LICENCIATURA)
-    institucion = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
     anio_obtencion = models.PositiveSmallIntegerField()
     cedula_profesional= models.CharField(max_length=50, blank=True, null=True)
@@ -53,7 +53,7 @@ class FormacionAcademica(models.Model):
 class ExperienciaProfesional(models.Model):
     experiencia_id = models.AutoField(primary_key=True)
     profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='experiencia_profesional', db_column='profesor_id')
-    organizacion = models.CharField(max_length=100)
+    organizacion_id = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT, related_name='experiencia_profesional', db_column='organizacion_id')
     puesto = models.CharField(max_length=100)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField(null=True, blank=True)
@@ -63,12 +63,12 @@ class ExperienciaProfesional(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} trabajó en {self.organizacion} como {self.puesto}"
+        return f"Profesor {self.profesor_id} trabajó en {self.organizacion_id} como {self.puesto}"
 
 class ExperienciaDiseno(models.Model):
     diseno_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='experiencia_disenio', db_column='profesor_id')
-    organizacion = models.CharField(max_length=100)
+    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='experiencia_diseno', db_column='profesor_id')
+    organizacion_id = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT, related_name='experiencia_diseno', db_column='organizacion_id')
     periodo = models.CharField(max_length=50)
     nivel_experiencia = models.CharField(max_length=50)
     descripcion = models.TextField(null=True, blank=True)
@@ -77,7 +77,7 @@ class ExperienciaDiseno(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} tiene experiencia de diseño de {self.nivel_experiencia} en {self.organizacion}"
+        return f"Profesor {self.profesor_id} tiene experiencia de diseño de {self.nivel_experiencia} en {self.organizacion_id}"
 
 class LogroProfesional(models.Model):
     logro_id = models.AutoField(primary_key=True)
@@ -95,9 +95,9 @@ class LogroProfesional(models.Model):
 class PremioDistincion(models.Model):
     premio_id = models.AutoField(primary_key=True)
     profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='premios_distinciones', db_column='profesor_id')
+    institucion_otorga = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT, related_name='premios_distinciones', db_column='organizacion_id')
     descripcion = models.TextField()
     anio = models.PositiveSmallIntegerField(null=True, blank=True)
-    institucion_otorga = models.CharField(max_length=100, null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -108,7 +108,7 @@ class PremioDistincion(models.Model):
 class ParticipacionOrganizaciones(models.Model):
     participacion_id = models.AutoField(primary_key=True)
     profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='participaciones_organizaciones', db_column='profesor_id')
-    organizacion = models.CharField(max_length=100)
+    organizacion_id = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT, related_name='participaciones_organizaciones', db_column='organizacion_id')
     periodo = models.CharField(max_length=50)
     nivel_participacion = models.CharField(max_length=50)
 
@@ -116,13 +116,13 @@ class ParticipacionOrganizaciones(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} participó en {self.organizacion}"
+        return f"Profesor {self.profesor_id} participó en {self.organizacion_id}"
 
 class CapacitacionDocente(models.Model):
     capacitacion_id = models.AutoField(primary_key=True)
     profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='capacitacion_docente', db_column='profesor_id')
+    institucion_id = models.ForeignKey('core.Institucion', on_delete=models.PROTECT, related_name='capacitacion_docente', db_column='institucion_id')
     nombre_curso = models.CharField(max_length=100)
-    institucion = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
     anio_obtencion = models.PositiveSmallIntegerField()
     horas = models.PositiveSmallIntegerField()
@@ -136,8 +136,8 @@ class CapacitacionDocente(models.Model):
 class ActualizacionDisciplinar(models.Model):
     actualizacion_id = models.AutoField(primary_key=True)
     profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='actualizacion_disciplinar', db_column='profesor_id')
+    institucion_id = models.ForeignKey('core.Institucion', on_delete=models.PROTECT, related_name='actualizaciones_disciplinar', db_column='institucion_id')
     nombre_curso = models.CharField(max_length=100)
-    institucion = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
     anio_obtencion = models.PositiveSmallIntegerField()
     horas = models.PositiveSmallIntegerField()

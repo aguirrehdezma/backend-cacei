@@ -34,7 +34,7 @@ class AportacionPESerializer(serializers.ModelSerializer):
 class GestionAcademicaSerializer(serializers.ModelSerializer):
     class Meta:
         model = GestionAcademica
-        fields = ['gestion_id', 'profesor_id', 'actividad', 'institucion', 'fecha_inicio', 'fecha_fin']
+        fields = ['gestion_id', 'profesor_id', 'institucion_id', 'actividad', 'fecha_inicio', 'fecha_fin']
         read_only_fields = ['gestion_id']
 
 class HallazgoSerializer(serializers.ModelSerializer):

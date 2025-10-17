@@ -94,8 +94,8 @@ class AportacionPE(models.Model):
 class GestionAcademica(models.Model):
     gestion_id = models.AutoField(primary_key=True)
     profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='gestion_academica', db_column='profesor_id')
+    institucion_id = models.ForeignKey('core.Institucion', on_delete=models.PROTECT, related_name='gestion_academica', db_column='institucion_id')
     actividad = models.CharField(max_length=100)
-    institucion = models.CharField(max_length=100)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField(blank=True, null=True)
     

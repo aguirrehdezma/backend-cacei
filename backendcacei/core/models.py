@@ -16,7 +16,7 @@ class Profesor(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor: {self.nombres} {self.apellido_paterno} {self.apellido_materno}"
+        return f"{self.nombres} {self.apellido_paterno} {self.apellido_materno}"
 
 class ProgramaEducativo(models.Model):
     ACTIVO = 'activo'

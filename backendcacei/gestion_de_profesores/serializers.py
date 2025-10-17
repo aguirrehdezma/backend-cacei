@@ -14,19 +14,19 @@ class ProfesorCursoSerializer(serializers.ModelSerializer):
 class FormacionAcademicaSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormacionAcademica
-        fields = ['formacion_id', 'profesor_id', 'nivel', 'institucion', 'pais', 'anio_obtencion', 'cedula_profesional', 'especialidad']
+        fields = ['formacion_id', 'profesor_id', 'institucion_id', 'nivel', 'pais', 'anio_obtencion', 'cedula_profesional', 'especialidad']
         read_only_fields = ['formacion_id']
 
 class ExperienciaProfesionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperienciaProfesional
-        fields = ['experiencia_id', 'profesor_id', 'organizacion', 'puesto', 'fecha_inicio', 'fecha_fin', 'actividades']
+        fields = ['experiencia_id', 'profesor_id', 'organizacion_id', 'puesto', 'fecha_inicio', 'fecha_fin', 'actividades']
         read_only_fields = ['experiencia_id']
 
 class ExperienciaDisenoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperienciaDiseno
-        fields = ['diseno_id', 'profesor_id', 'organizacion', 'periodo', 'nivel_experiencia', 'descripcion']
+        fields = ['diseno_id', 'profesor_id', 'organizacion_id', 'periodo', 'nivel_experiencia', 'descripcion']
         read_only_fields = ['diseno_id']
 
 class LogroProfesionalSerializer(serializers.ModelSerializer):
@@ -44,19 +44,19 @@ class PremioDistincionSerializer(serializers.ModelSerializer):
 class ParticipacionOrganizacionesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParticipacionOrganizaciones
-        fields = ['participacion_id', 'profesor_id', 'nombre_organizacion', 'periodo', 'nivel_participacion']
+        fields = ['participacion_id', 'profesor_id', 'organizacion_id', 'periodo', 'nivel_participacion']
         read_only_fields = ['participacion_id']
 
 class CapacitacionDocenteSerializer(serializers.ModelSerializer):
     class Meta:
         model = CapacitacionDocente
-        fields = ['capacitacion_id', 'profesor_id', 'nombre_curso', 'institucion', 'pais', 'anio_obtencion', 'horas']
+        fields = ['capacitacion_id', 'profesor_id', 'institucion_id', 'nombre_curso', 'pais', 'anio_obtencion', 'horas']
         read_only_fields = ['capacitacion_id']
 
 class ActualizacionDisciplinarSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActualizacionDisciplinar
-        fields = ['actualizacion_id', 'profesor_id', 'nombre_curso', 'institucion', 'pais', 'anio_obtencion', 'horas']
+        fields = ['actualizacion_id', 'profesor_id', 'institucion_id', 'nombre_curso', 'pais', 'anio_obtencion', 'horas']
         read_only_fields = ['actualizacion_id']
 
 class ProductoAcademicoSerializer(serializers.ModelSerializer):
