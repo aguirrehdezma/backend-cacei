@@ -16,16 +16,22 @@ class ProgramaEducativoSerializer(serializers.ModelSerializer):
 
 class CursoSerializer(serializers.ModelSerializer):
     curso_ejes = serializers.SerializerMethodField()
+    curso_atributos_pe = serializers.SerializerMethodField()
     
     class Meta:
         model = Curso
-        fields = ['curso_id', 'programa_id', 'clave', 'nombre', 'seriacion', 'ubicacion', 'tipo', 'horas_totales', 'objetivo_general', 'curso_ejes']
+        fields = ['curso_id', 'programa_id', 'clave', 'nombre', 'seriacion', 'ubicacion', 'tipo', 'horas_totales', 'objetivo_general', 'curso_ejes', 'curso_atributos_pe']
         read_only_fields = ['curso_id']
     
     def get_curso_ejes(self, obj):
         from gestion_academica.serializers import CursoEjeSerializer
         curso_ejes = obj.curso_eje.all()
         return CursoEjeSerializer(curso_ejes, many=True).data
+    
+    def get_curso_atributos_pe(self, obj):
+        from gestion_academica.serializers import CursoAtributoPESerializer
+        curso_atributos_pe = obj.curso_atributo_pe.all()
+        return CursoAtributoPESerializer(curso_atributos_pe, many=True).data
 
 class InstitucionSerializer(serializers.ModelSerializer):
     class Meta:

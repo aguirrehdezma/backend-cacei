@@ -157,3 +157,12 @@ class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
             } for eje_id, horas in totales.items()],
             "porcentajes": porcentajes
         }
+
+class CedulaCursosVsAEPSerializer(serializers.ModelSerializer):
+    cursos = CursoSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProgramaEducativo
+        fields = [
+            "cursos"
+        ]
