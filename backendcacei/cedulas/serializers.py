@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
 from gestion_academica.models import AtributoPE, ObjetivoEducacional
-from core.models import Profesor, Curso
+from core.models import Profesor, Curso, ProgramaEducativo
 from gestion_academica.serializers import AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer, CursoAtributoPESerializer, HorasSemanaSerializer, UnidadTematicaSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, PracticaSerializer, BibliografiaSerializer
 from evaluacion_acreditacion.models import Hallazgo
-from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer
-from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer
+from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer 
+from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer 
+from core.serializers import CursoSerializer
 
 
 class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
@@ -96,4 +97,13 @@ class CedulaValoracionOEPESerializer(serializers.ModelSerializer):
         fields = [
             "descripcion",
             "atributo_pe_objetivo",
+        ]
+
+class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
+    cursos = CursoSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProgramaEducativo
+        fields = [
+            "cursos"
         ]

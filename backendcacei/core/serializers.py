@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from core.models import Curso, Institucion, Organizacion, Profesor, ProgramaEducativo
 
-
 class ProfesorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profesor
