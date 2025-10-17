@@ -73,12 +73,26 @@ class AtributoPECACEISerializer(serializers.ModelSerializer):
         fields = ['atributo_pe_cacei_id', 'atributo_pe_id', 'atributo_cacei_id', 'justificacion', 'atributo_cacei']
         read_only_fields = ['atributo_pe_cacei_id']
 
+class AtributoPEObjetivoSerializer(serializers.ModelSerializer):
+    valoracion_aep = serializers.SerializerMethodField()
+    objetivos_educacionales = ObjetivoEducacionalSerializer(read_only=True, source='objetivo_id')
+
+    class Meta:
+        model = AtributoPEObjetivo
+        fields = ['atributo_pe_objetivo_id', 'atributo_pe_id', 'objetivo_id', 'justificacion', 'valoracion_aep', 'objetivos_educacionales']
+        read_only_fields = ['atributo_pe_objetivo_id']
+    
+    def get_valoracion_aep(self, obj):
+        from cedulas.serializers import CedulaHerramientasValoracionAEPSerializer  
+        return CedulaHerramientasValoracionAEPSerializer(obj.atributo_pe_id).data
+
 class AtributoPESerializer(serializers.ModelSerializer):
     atributo_pe_cacei = AtributoPECACEISerializer(many=True, read_only=True)
+    atributo_pe_objetivo = AtributoPEObjetivoSerializer(many=True, read_only=True)
 
     class Meta:
         model = AtributoPE
-        fields = ['atributo_pe_id', 'programa_id', 'codigo', 'nombre', 'nombre_abreviado', 'descripcion', 'atributo_pe_cacei']
+        fields = ['atributo_pe_id', 'programa_id', 'codigo', 'nombre', 'nombre_abreviado', 'descripcion', 'atributo_pe_cacei', 'atributo_pe_objetivo']
         read_only_fields = ['atributo_pe_id']
 
 class CursoAtributoPESerializer(serializers.ModelSerializer):
@@ -94,18 +108,6 @@ class CursoEjeSerializer(serializers.ModelSerializer):
         model = CursoEje
         fields = ['curso_eje_id', 'curso_id', 'eje_id', 'horas']
         read_only_fields = ['curso_eje_id']
-
-class AtributoPEObjetivoSerializer(serializers.ModelSerializer):
-    valoracion_aep = serializers.SerializerMethodField()
-
-    class Meta:
-        model = AtributoPEObjetivo
-        fields = ['atributo_pe_objetivo_id', 'atributo_pe_id', 'objetivo_id', 'justificacion', 'valoracion_aep']
-        read_only_fields = ['atributo_pe_objetivo_id']
-    
-    def get_valoracion_aep(self, obj):
-        from cedulas.serializers import CedulaHerramientasValoracionAEPSerializer  
-        return CedulaHerramientasValoracionAEPSerializer(obj.atributo_pe_id).data
 
 class PracticaSerializer(serializers.ModelSerializer):
     class Meta:

@@ -4,7 +4,7 @@ from gestion_academica.models import AtributoPE, ObjetivoEducacional
 from core.models import Profesor, Curso, ProgramaEducativo
 from evaluacion_acreditacion.models import Hallazgo
 
-from cedulas.serializers import CedulaAEPVsAECACEISerializer, CedulaCVSinteticoSerializer, CedulaHerramientasValoracionAEPSerializer, CedulaPlanMejoraSerializer, CedulaProgramaAsignaturaSerializer, CedulaValoracionOEPESerializer, CedulaOrganizacionCurricularSerializer, CedulaCursosVsAEPSerializer
+from cedulas.serializers import CedulaAEPVsAECACEISerializer, CedulaAEPVsOESerializer, CedulaCVSinteticoSerializer, CedulaHerramientasValoracionAEPSerializer, CedulaPlanMejoraSerializer, CedulaProgramaAsignaturaSerializer, CedulaValoracionOEPESerializer, CedulaOrganizacionCurricularSerializer, CedulaCursosVsAEPSerializer
 
 # Create your views here.
 class CedulaCVSinteticoView(generics.RetrieveAPIView):
@@ -38,3 +38,7 @@ class CedulaCursosVsAEPView(generics.RetrieveAPIView):
 class CedulaAEPVsAECACEIView(generics.RetrieveAPIView):
     queryset = ProgramaEducativo.objects.all()
     serializer_class = CedulaAEPVsAECACEISerializer
+
+class CedulaAEPVsOEView(generics.RetrieveAPIView):
+    queryset = ProgramaEducativo.objects.all()
+    serializer_class = CedulaAEPVsOESerializer

@@ -177,3 +177,13 @@ class CedulaAEPVsAECACEISerializer(serializers.ModelSerializer):
             "programa_id",
             "atributos_pe"
         ]
+
+class CedulaAEPVsOESerializer(serializers.ModelSerializer):
+    atributos_pe = AtributoPESerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = ProgramaEducativo
+        fields = [
+            "programa_id",
+            "atributos_pe"
+        ]
