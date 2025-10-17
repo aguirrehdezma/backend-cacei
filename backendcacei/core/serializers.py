@@ -15,10 +15,17 @@ class ProgramaEducativoSerializer(serializers.ModelSerializer):
         read_only_fields = ['programa_id']
 
 class CursoSerializer(serializers.ModelSerializer):
+    curso_ejes = serializers.SerializerMethodField()
+    
     class Meta:
         model = Curso
-        fields = ['curso_id', 'programa_id', 'clave', 'nombre', 'seriacion', 'ubicacion', 'tipo', 'horas_totales', 'objetivo_general']
+        fields = ['curso_id', 'programa_id', 'clave', 'nombre', 'seriacion', 'ubicacion', 'tipo', 'horas_totales', 'objetivo_general', 'curso_ejes']
         read_only_fields = ['curso_id']
+    
+    def get_curso_ejes(self, obj):
+        from gestion_academica.serializers import CursoEjeSerializer
+        curso_ejes = obj.curso_eje.all()
+        return CursoEjeSerializer(curso_ejes, many=True).data
 
 class InstitucionSerializer(serializers.ModelSerializer):
     class Meta:

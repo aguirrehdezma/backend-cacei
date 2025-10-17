@@ -1,13 +1,14 @@
+from collections import defaultdict
 from rest_framework import serializers
 
 from gestion_academica.models import AtributoPE, ObjetivoEducacional
 from core.models import Profesor, Curso, ProgramaEducativo
-from gestion_academica.serializers import AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer, CursoAtributoPESerializer, HorasSemanaSerializer, UnidadTematicaSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, PracticaSerializer, BibliografiaSerializer
 from evaluacion_acreditacion.models import Hallazgo
+
+from gestion_academica.serializers import AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer, CursoAtributoPESerializer, HorasSemanaSerializer, UnidadTematicaSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, PracticaSerializer, BibliografiaSerializer
 from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer 
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer 
 from core.serializers import CursoSerializer
-
 
 class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
     formacion_academica = FormacionAcademicaSerializer(many=True, read_only=True)
@@ -100,10 +101,59 @@ class CedulaValoracionOEPESerializer(serializers.ModelSerializer):
         ]
 
 class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
-    cursos = CursoSerializer(many=True, read_only=True)
+    cursos_obligatorios = serializers.SerializerMethodField()
+    cursos_optativos = serializers.SerializerMethodField()
+    totales_por_eje = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgramaEducativo
-        fields = [
-            "cursos"
+        fields = ['programa_id', 'cursos_obligatorios', 'cursos_optativos', 'totales_por_eje']
+
+    def get_cursos_obligatorios(self, obj):
+        cursos = obj.cursos.filter(tipo='obligatorio')
+        return CursoSerializer(cursos, many=True).data
+
+    def get_cursos_optativos(self, obj):
+        cursos = obj.cursos.filter(tipo='optativo')
+        return CursoSerializer(cursos, many=True).data
+
+    def get_totales_por_eje(self, obj):
+        totales_obligatorios = defaultdict(int)
+        totales_optativos = defaultdict(int)
+        totales = defaultdict(int)
+
+        for curso in obj.cursos.all():
+            for curso_eje in curso.curso_eje.all():
+                eje_id = curso_eje.eje_id_id
+                horas = curso_eje.horas
+                if curso.tipo == 'obligatorio':
+                    totales_obligatorios[eje_id] += horas
+                else:
+                    totales_optativos[eje_id] += horas
+                totales[eje_id] += horas
+
+        total_horas = sum(totales.values()) or 1
+
+        porcentajes = [
+            {
+                "eje_id": eje_id,
+                "porcentaje": round(horas / total_horas * 100, 2)
+            }
+            for eje_id, horas in totales.items()
         ]
+
+        return {
+            "obligatorios": [{
+                "eje_id": eje_id,
+                "horas": horas
+            } for eje_id, horas in totales_obligatorios.items()],
+            "optativos": [{
+                "eje_id": eje_id,
+                "horas": horas
+            } for eje_id, horas in totales_optativos.items()],
+            "totales": [{
+                "eje_id": eje_id,
+                "horas": horas
+            } for eje_id, horas in totales.items()],
+            "porcentajes": porcentajes
+        }
