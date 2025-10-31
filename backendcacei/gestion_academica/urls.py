@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from gestion_academica.views import AtributoCACEIViewSet, AtributoPECACEIViewSet, AtributoPEObjetivoViewSet, AtributoPEViewSet, BibliografiaViewSet, CriterioDesempenoViewSet, CursoAtributoPEViewSet, CursoEjeViewSet, EjeConocimientoViewSet, EstrategiaEnsenanzaViewSet, EstrategiaEvaluacionViewSet, HorasSemanaViewSet, ObjetivoEducacionalViewSet, ObjetivoEspecificoViewSet, PracticaViewSet, UnidadTematicaViewSet
+from gestion_academica.views import AlumnoViewSet, AtributoCACEIViewSet, AtributoPECACEIViewSet, AtributoPEObjetivoViewSet, AtributoPEViewSet, BibliografiaViewSet, CalificacionViewSet, CriterioDesempenoViewSet, CursoAtributoPEViewSet, CursoEjeViewSet, EjeConocimientoViewSet, EstrategiaEnsenanzaViewSet, EstrategiaEvaluacionViewSet, HorasSemanaViewSet, ObjetivoEducacionalViewSet, ObjetivoEspecificoViewSet, PracticaViewSet, UnidadTematicaViewSet
 
 router = routers.SimpleRouter()
 router.register(r'unidades_tematicas', UnidadTematicaViewSet, basename='unidad-tematica')
@@ -19,4 +19,6 @@ router.register(r'cursos_ejes', CursoEjeViewSet, basename='curso-eje')
 router.register(r'atributos_pe_objetivos', AtributoPEObjetivoViewSet, basename='atributo-pe-objetivo')
 router.register(r'atributos_pe_cacei', AtributoPECACEIViewSet, basename='atributo-pe-cacei')
 router.register(r'practicas', PracticaViewSet, basename='practica')
+router.register(r'alumnos', AlumnoViewSet, basename='alumno')
+router.register(r'calificaciones', CalificacionViewSet, basename='calificacion')
 urlpatterns = router.urls

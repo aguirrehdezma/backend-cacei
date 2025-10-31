@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 class UnidadTematica(models.Model):
@@ -191,3 +192,31 @@ class Practica(models.Model):
     
     def __str__(self):
         return f"Práctica {self.numero}"
+
+class Alumno(models.Model):
+    alumno_id = models.AutoField(primary_key=True)
+    matricula = models.CharField(max_length=50, unique=True)
+    nombre = models.CharField(max_length=50)
+    apellido1 = models.CharField(max_length=50)
+    apellido2 = models.CharField(max_length=50, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.matricula} - {self.nombre} {self.apellido1} {self.apellido2 or ''}"
+
+class Calificacion(models.Model):
+    calificacion_id = models.AutoField(primary_key=True)
+    alumno = models.ForeignKey(Alumno, on_delete=models.PROTECT, related_name='calificaciones')
+    profesor_curso = models.ForeignKey('gestion_de_profesores.ProfesorCurso', on_delete=models.PROTECT, related_name='calificaciones')
+    valor = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        help_text="Calificación del alumno entre 0 y 100"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.alumno.matricula} - {self.valor}"

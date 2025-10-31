@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from gestion_academica.models import AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, Practica, UnidadTematica
-from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, BibliografiaSerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, CursoEjeSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, PracticaSerializer, UnidadTematicaSerializer
+from gestion_academica.models import Alumno, AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, Calificacion, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, Practica, UnidadTematica
+from gestion_academica.serializers import AlumnoSerializer, AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, BibliografiaSerializer, CalificacionSerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, CursoEjeSerializer, EjeConocimientoSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, HorasSemanaSerializer, ObjetivoEducacionalSerializer, ObjetivoEspecificoSerializer, PracticaSerializer, UnidadTematicaSerializer
 
 # Create your views here.
 class UnidadTematicaViewSet(viewsets.ModelViewSet):
@@ -67,3 +67,11 @@ class AtributoPECACEIViewSet(viewsets.ModelViewSet):
 class PracticaViewSet(viewsets.ModelViewSet):
     queryset = Practica.objects.all()
     serializer_class = PracticaSerializer
+
+class AlumnoViewSet(viewsets.ModelViewSet):
+    queryset = Alumno.objects.all()
+    serializer_class = AlumnoSerializer
+
+class CalificacionViewSet(viewsets.ModelViewSet):
+    queryset = Calificacion.objects.all()
+    serializer_class = CalificacionSerializer
