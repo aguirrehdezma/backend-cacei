@@ -1,15 +1,17 @@
 from collections import defaultdict
 from rest_framework import serializers
 
+from cedulas.models import Cedula, CursoObligatorio, CursoOptativo
 from gestion_academica.models import AtributoPE, ObjetivoEducacional
-from core.models import Profesor, Curso, ProgramaEducativo
+from core.models import Periodo, Profesor, Curso, ProgramaEducativo
 from evaluacion_acreditacion.models import Hallazgo
 
 from gestion_academica.serializers import AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer, CursoAtributoPESerializer, HorasSemanaSerializer, UnidadTematicaSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, PracticaSerializer, BibliografiaSerializer
 from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer 
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer 
-from core.serializers import CursoSerializer
+from core.serializers import CursoSerializer, PeriodoSerializer, ProgramaEducativoSerializer
 
+'''
 class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
     formacion_academica = FormacionAcademicaSerializer(many=True, read_only=True)
     capacitacion_docente = CapacitacionDocenteSerializer(many=True, read_only=True)
@@ -187,3 +189,53 @@ class CedulaAEPVsOESerializer(serializers.ModelSerializer):
             "programa_id",
             "atributos_pe"
         ]
+'''
+
+class CedulaSerializer(serializers.ModelSerializer):
+    programa = ProgramaEducativoSerializer(read_only=True)
+    periodo = PeriodoSerializer(read_only=True)
+    programa_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProgramaEducativo.objects.all(), source='programa', write_only=True
+    )
+    periodo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Periodo.objects.all(), source='periodo', write_only=True
+    )
+
+    cursos_obligatorios = serializers.SerializerMethodField()
+    cursos_optativos = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cedula
+        fields = [
+            "id", "programa", "programa_id", "periodo", "periodo_id", "tipo",
+            "cursos_obligatorios",
+            "cursos_optativos",
+        ]
+    
+    def get_cursos_obligatorios(self, obj):
+        relaciones = CursoObligatorio.objects.filter(cedula=obj)
+        return CursoObligatorioSerializer(relaciones, many=True).data
+
+    def get_cursos_optativos(self, obj):
+        relaciones = CursoOptativo.objects.filter(cedula=obj)
+        return CursoOptativoSerializer(relaciones, many=True).data
+
+class CursoOptativoSerializer(serializers.ModelSerializer):
+    curso = CursoSerializer(read_only=True)
+
+    class Meta:
+        model = CursoOptativo
+        fields = [
+            "id", "curso",
+        ]
+        read_only_fields = ["id"]
+
+class CursoObligatorioSerializer(serializers.ModelSerializer):
+    curso = CursoSerializer(read_only=True)
+    
+    class Meta:
+        model = CursoObligatorio
+        fields = [
+            "id", "curso",
+        ]
+        read_only_fields = ["id"]

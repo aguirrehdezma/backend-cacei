@@ -1,7 +1,10 @@
-from django.urls import path
+from rest_framework import routers
 
-from cedulas.views import CedulaAEPVsAECACEIView, CedulaAEPVsOEView, CedulaCVSinteticoView, CedulaCursosVsAEPView, CedulaHerramientasValoracionAEPView, CedulaPlanMejoraView, CedulaProgramaAsignaturaView, CedulaValoracionOEPEView, CedulaOrganizacionCurricularView
+from cedulas.views import CedulaViewSet, CursoObligatorioViewSet, CursoOptativoViewSet
 
+# from cedulas.views import CedulaAEPVsAECACEIView, CedulaAEPVsOEView, CedulaCVSinteticoView, CedulaCursosVsAEPView, CedulaHerramientasValoracionAEPView, CedulaPlanMejoraView, CedulaProgramaAsignaturaView, CedulaValoracionOEPEView, CedulaOrganizacionCurricularView, CedulaViewSet, CursoObligatorioViewSet, CursoOptativoViewSet
+
+'''
 urlpatterns = [
     path("profesores/<int:pk>/cv/", CedulaCVSinteticoView.as_view(), name="cedula-cv-sintetico"),
     path("hallazgos/<int:pk>/plan-mejora/", CedulaPlanMejoraView.as_view(), name="cedula-plan-mejora"),
@@ -13,3 +16,10 @@ urlpatterns = [
     path("programas_educativos/<int:pk>/aep_vs_aecacei/", CedulaAEPVsAECACEIView.as_view(), name="cedula-aep-vs-aecacei"),
     path("programas_educativos/<int:pk>/aep_vs_oe/", CedulaAEPVsOEView.as_view(), name="cedula-aep-vs-oe"),
 ]
+'''
+
+router = routers.SimpleRouter()
+router.register(r'', CedulaViewSet, basename='cedulas')
+router.register(r'cursos_obligatorios', CursoObligatorioViewSet, basename='curso-obligatorio')
+router.register(r'cursos_optativos', CursoOptativoViewSet, basename='curso-optativo')
+urlpatterns = router.urls

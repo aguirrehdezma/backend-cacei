@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from core.models import Curso, Institucion, Organizacion, Profesor, ProgramaEducativo
-from core.serializers import CursoSerializer, InstitucionSerializer, OrganizacionSerializer, ProfesorSerializer, ProgramaEducativoSerializer
+from core.models import Curso, Institucion, Organizacion, Periodo, Profesor, ProgramaEducativo
+from core.serializers import CursoSerializer, InstitucionSerializer, OrganizacionSerializer, PeriodoSerializer, ProfesorSerializer, ProgramaEducativoSerializer
 
 # Create your views here.
 class ProfesorViewSet(viewsets.ModelViewSet):
@@ -23,3 +23,7 @@ class InstitucionViewSet(viewsets.ModelViewSet):
 class OrganizacionViewSet(viewsets.ModelViewSet):
     queryset = Organizacion.objects.all()
     serializer_class = OrganizacionSerializer
+
+class PeriodoViewSet(viewsets.ModelViewSet):
+    queryset = Periodo.objects.all()
+    serializer_class = PeriodoSerializer

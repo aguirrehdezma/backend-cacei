@@ -2,7 +2,6 @@ from django.db import models
 
 # Create your models here.
 class Profesor(models.Model):
-    profesor_id = models.AutoField(primary_key=True)
     numero_empleado = models.CharField(max_length=20, unique=True)
     apellido_paterno = models.CharField(max_length=50)
     apellido_materno = models.CharField(max_length=50)
@@ -29,7 +28,6 @@ class ProgramaEducativo(models.Model):
         (EN_REVISION, 'En Revisión'),
     ]
 
-    programa_id = models.AutoField(primary_key=True)
     clave = models.CharField(max_length=20, unique=True)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
@@ -51,8 +49,8 @@ class Curso(models.Model):
         (OPTATIVO, 'Optativo'),
     ]
     
-    curso_id = models.AutoField(primary_key=True)
-    programa_id = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, related_name='cursos', db_column='programa_id')
+    programa = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT)
+    
     clave = models.CharField(max_length=20, unique=True)
     nombre = models.CharField(max_length=100)
     seriacion = models.TextField(blank=True, null=True)
@@ -68,7 +66,6 @@ class Curso(models.Model):
         return self.clave + " - " + self.nombre
 
 class Institucion(models.Model):
-    institucion_id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -78,11 +75,21 @@ class Institucion(models.Model):
         return self.nombre
 
 class Organizacion(models.Model):
-    organizacion_id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.nombre
+
+class Periodo(models.Model):
+    nombre = models.CharField(max_length=50)
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
         return self.nombre

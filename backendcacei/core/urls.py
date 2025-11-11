@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from core.views import CursoViewSet, InstitucionViewSet, OrganizacionViewSet, ProfesorViewSet, ProgramaEducativoViewSet
+from core.views import CursoViewSet, InstitucionViewSet, OrganizacionViewSet, PeriodoViewSet, ProfesorViewSet, ProgramaEducativoViewSet
 
 router = routers.SimpleRouter()
 router.register(r'profesores', ProfesorViewSet, basename='profesor')
@@ -8,4 +8,5 @@ router.register(r'programas_educativos', ProgramaEducativoViewSet, basename='pro
 router.register(r'cursos', CursoViewSet, basename='curso')
 router.register(r'instituciones', InstitucionViewSet, basename='institucion')
 router.register(r'organizaciones', OrganizacionViewSet, basename='organizacion')
+router.register(r'periodos', PeriodoViewSet, basename='periodo')
 urlpatterns = router.urls

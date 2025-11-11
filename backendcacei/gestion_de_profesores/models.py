@@ -10,9 +10,9 @@ class ProfesorCurso(models.Model):
         (INSTRUCTOR, 'Instructor'),
     ]
 
-    profesor_curso_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='profesores_cursos', db_column='profesor_id')
-    curso_id = models.ForeignKey('core.Curso', on_delete=models.PROTECT, related_name='profesores_cursos', db_column='curso_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
+    
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=RESPONSABLE)
     periodo = models.CharField(max_length=50)
     
@@ -20,7 +20,7 @@ class ProfesorCurso(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} imparte el curso {self.curso_id}"
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} imparte el curso {self.curso.clave}"
 
 class FormacionAcademica(models.Model):
     LICENCIATURA = 'licenciatura'
@@ -35,9 +35,9 @@ class FormacionAcademica(models.Model):
         (DOCTORADO, 'Doctorado'),
     ]
 
-    formacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='formacion_academica', db_column='profesor_id')
-    institucion_id = models.ForeignKey('core.Institucion', on_delete=models.PROTECT, related_name='formacion_academica', db_column='institucion_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    institucion = models.ForeignKey('core.Institucion', on_delete=models.PROTECT)
+    
     nivel = models.CharField(max_length=20, choices=NIVEL_CHOICES, default=LICENCIATURA)
     pais = models.CharField(max_length=50)
     anio_obtencion = models.PositiveSmallIntegerField()
@@ -48,12 +48,12 @@ class FormacionAcademica(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} tiene formacion academica de {self.nivel}"
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} tiene formacion academica de {self.nivel}"
 
 class ExperienciaProfesional(models.Model):
-    experiencia_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='experiencia_profesional', db_column='profesor_id')
-    organizacion_id = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT, related_name='experiencia_profesional', db_column='organizacion_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    organizacion = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT)
+    
     puesto = models.CharField(max_length=100)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField(null=True, blank=True)
@@ -63,12 +63,12 @@ class ExperienciaProfesional(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} trabajó en {self.organizacion_id} como {self.puesto}"
-
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} trabajó en {self.organizacion.nombre} como {self.puesto}"
+    
 class ExperienciaDiseno(models.Model):
-    diseno_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='experiencia_diseno', db_column='profesor_id')
-    organizacion_id = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT, related_name='experiencia_diseno', db_column='organizacion_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    organizacion = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT)
+    
     periodo = models.CharField(max_length=50)
     nivel_experiencia = models.CharField(max_length=50)
     descripcion = models.TextField(null=True, blank=True)
@@ -77,11 +77,11 @@ class ExperienciaDiseno(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} tiene experiencia de diseño de {self.nivel_experiencia} en {self.organizacion_id}"
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} tiene experiencia de diseño de {self.nivel_experiencia} en {self.organizacion.nombre}"
 
 class LogroProfesional(models.Model):
-    logro_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='logros_profesionales', db_column='profesor_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    
     descripcion = models.TextField()
     anio = models.PositiveSmallIntegerField(null=True, blank=True)
     relevancia = models.TextField(null=True, blank=True)
@@ -90,12 +90,12 @@ class LogroProfesional(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} tiene logros de {self.descripcion} en {self.anio}"
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} tiene logros de {self.descripcion} en {self.anio}"
 
 class PremioDistincion(models.Model):
-    premio_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='premios_distinciones', db_column='profesor_id')
-    institucion_otorga = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT, related_name='premios_distinciones', db_column='organizacion_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    institucion_otorga = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT)
+    
     descripcion = models.TextField()
     anio = models.PositiveSmallIntegerField(null=True, blank=True)
     
@@ -103,12 +103,12 @@ class PremioDistincion(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} recibió el premio {self.descripcion} en {self.anio}"
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} recibió el premio {self.descripcion} en {self.anio}"
 
 class ParticipacionOrganizaciones(models.Model):
-    participacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='participaciones_organizaciones', db_column='profesor_id')
-    organizacion_id = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT, related_name='participaciones_organizaciones', db_column='organizacion_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    organizacion = models.ForeignKey('core.Organizacion', on_delete=models.PROTECT)
+    
     periodo = models.CharField(max_length=50)
     nivel_participacion = models.CharField(max_length=50)
 
@@ -116,12 +116,12 @@ class ParticipacionOrganizaciones(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} participó en {self.organizacion_id}"
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} participó en {self.organizacion.nombre}"
 
 class CapacitacionDocente(models.Model):
-    capacitacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='capacitacion_docente', db_column='profesor_id')
-    institucion_id = models.ForeignKey('core.Institucion', on_delete=models.PROTECT, related_name='capacitacion_docente', db_column='institucion_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    institucion = models.ForeignKey('core.Institucion', on_delete=models.PROTECT)
+    
     nombre_curso = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
     anio_obtencion = models.PositiveSmallIntegerField()
@@ -131,12 +131,12 @@ class CapacitacionDocente(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} recibió esta capacitación docente {self.capacitacion_id}"
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} recibió esta capacitación docente {self.nombre_curso}"
 
 class ActualizacionDisciplinar(models.Model):
-    actualizacion_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='actualizacion_disciplinar', db_column='profesor_id')
-    institucion_id = models.ForeignKey('core.Institucion', on_delete=models.PROTECT, related_name='actualizaciones_disciplinar', db_column='institucion_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    institucion = models.ForeignKey('core.Institucion', on_delete=models.PROTECT)
+    
     nombre_curso = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
     anio_obtencion = models.PositiveSmallIntegerField()
@@ -146,7 +146,7 @@ class ActualizacionDisciplinar(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor_id} recibió esta actualización disciplinar {self.actualizacion_id}"
+        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} recibió esta actualización disciplinar {self.nombre_curso}"
 
 class ProductoAcademico(models.Model):
     PUBLICACION = 'publicacion'
@@ -161,8 +161,8 @@ class ProductoAcademico(models.Model):
         (OTRO, 'Otro'),
     ]
     
-    producto_id = models.AutoField(primary_key=True)
-    profesor_id = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, related_name='productos_academicos', db_column='profesor_id')
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+
     descripcion = models.TextField()
     anio = models.PositiveSmallIntegerField()
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=PUBLICACION)
