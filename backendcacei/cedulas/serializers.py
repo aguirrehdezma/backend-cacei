@@ -8,8 +8,8 @@ from evaluacion_acreditacion.models import Hallazgo
 
 from gestion_academica.serializers import AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer, CursoAtributoPESerializer, HorasSemanaSerializer, UnidadTematicaSerializer, EstrategiaEnsenanzaSerializer, EstrategiaEvaluacionSerializer, PracticaSerializer, BibliografiaSerializer
 from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer 
-from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer 
-from core.serializers import CursoSerializer, PeriodoSerializer, ProgramaEducativoSerializer
+from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer
+from core.serializers import CursoSerializer, PeriodoSerializer, ProgramaEducativoSerializer, ProfesorSerializer
 
 '''
 class CedulaCVSinteticoSerializer(serializers.ModelSerializer):
@@ -191,7 +191,7 @@ class CedulaAEPVsOESerializer(serializers.ModelSerializer):
         ]
 '''
 
-class CedulaSerializer(serializers.ModelSerializer):
+class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
     programa = ProgramaEducativoSerializer(read_only=True)
     periodo = PeriodoSerializer(read_only=True)
     programa_id = serializers.PrimaryKeyRelatedField(
@@ -239,3 +239,51 @@ class CursoObligatorioSerializer(serializers.ModelSerializer):
             "id", "curso",
         ]
         read_only_fields = ["id"]
+
+class CedulaCvSinteticoSerializer(serializers.ModelSerializer):
+    profesor = ProfesorSerializer(read_only=True)
+    profesor_id = serializers.PrimaryKeyRelatedField(
+        queryset=Profesor.objects.all(), source='profesor', write_only=True
+    )
+    actualizacion = ActualizacionDisciplinarSerializer(many=True, read_only=True)
+    formaciones = serializers.SerializerMethodField()
+    capacitaciones = serializers.SerializerMethodField()
+    experiencias = serializers.SerializerMethodField()
+    diseno = serializers.SerializerMethodField()
+    logro = serializers.SerializerMethodField()
+    participacion = serializers.SerializerMethodField()
+    premio = serializers.SerializerMethodField()
+    producto = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cedula
+        fields = [
+            "id", "tipo", "profesor", "profesor_id",
+            "formaciones", "capacitaciones", "experiencias", "diseno", "logro", "participacion", "premio", "producto"
+        ]
+
+    def get_formaciones(self, obj):
+        return FormacionAcademicaSerializer(obj.profesor.formacionacademica_set.all(), many=True).data
+
+    def get_capacitaciones(self, obj):
+        return CapacitacionDocenteSerializer(obj.profesor.capacitaciondocente_set.all(), many=True).data
+
+    def get_experiencias(self, obj):
+        return ExperienciaDisenoSerializer(obj.profesor.experienciadiseno_set.all(), many=True).data
+    
+    def get_diseno(self, obj):
+        return ExperienciaDisenoSerializer(obj.profesor.experienciadiseno_set.all(), many=True).data
+    
+    def get_logro(self, obj):   
+        return LogroProfesionalSerializer(obj.profesor.logroprofesional_set.all(), many=True).data
+    
+    def get_participacion(self, obj):
+        return ParticipacionOrganizacionesSerializer(obj.profesor.participacionorganizaciones_set.all(), many=True).data
+    
+    def get_premio(self, obj):
+        return PremioDistincionSerializer(obj.profesor.premiodistincion_set.all(), many=True).data
+    
+    def get_producto(self, obj):
+        return ProductoAcademicoSerializer(obj.profesor.productoacademico_set.all(), many=True).data
+    
+    

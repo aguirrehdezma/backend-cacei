@@ -1,18 +1,20 @@
 from django.db import models
 
-from core.models import Curso, Periodo, ProgramaEducativo
+from core.models import Curso, Periodo, ProgramaEducativo, Profesor
 
 # Create your models here.
 class Cedula(models.Model):
     ORGANIZACION_CURRICULAR = 'organizacion_curricular'
-    
+    CV_SINTETICO = 'cv_sintetico'
+
     TIPO_CHOICES = [
         (ORGANIZACION_CURRICULAR, 'Organización Curricular'),
+        (CV_SINTETICO, 'CV Sintético'),
     ]
     
     programa = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, null=True, blank=True)
     periodo = models.ForeignKey(Periodo, on_delete=models.PROTECT, null=True, blank=True)
-    
+    profesor = models.ForeignKey(Profesor, on_delete=models.PROTECT, null=True, blank=True)
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=ORGANIZACION_CURRICULAR)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -62,3 +64,6 @@ class CursoOptativo(models.Model):
 
     def __str__(self):
         return f"{self.curso.nombre} (Optativo)"
+    
+
+

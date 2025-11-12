@@ -1,7 +1,7 @@
 from rest_framework import generics
 from rest_framework import viewsets
 
-from cedulas.serializers import CedulaSerializer, CursoObligatorioSerializer, CursoOptativoSerializer
+from cedulas.serializers import  CursoObligatorioSerializer, CursoOptativoSerializer, CedulaCvSinteticoSerializer, CedulaOrganizacionCurricularSerializer
 from cedulas.models import Cedula, CursoObligatorio, CursoOptativo
 from gestion_academica.models import AtributoPE, ObjetivoEducacional
 from core.models import Profesor, Curso, ProgramaEducativo
@@ -48,9 +48,7 @@ class CedulaAEPVsOEView(generics.RetrieveAPIView):
     serializer_class = CedulaAEPVsOESerializer
 '''
 
-class CedulaViewSet(viewsets.ModelViewSet):
-    queryset = Cedula.objects.all()
-    serializer_class = CedulaSerializer
+
 
 class CursoObligatorioViewSet(viewsets.ModelViewSet):
     queryset = CursoObligatorio.objects.all()
@@ -59,3 +57,15 @@ class CursoObligatorioViewSet(viewsets.ModelViewSet):
 class CursoOptativoViewSet(viewsets.ModelViewSet):
     queryset = CursoOptativo.objects.all()
     serializer_class = CursoOptativoSerializer
+
+class CedulaViewSet(viewsets.ModelViewSet):
+    queryset = Cedula.objects.all()
+
+    def get_serializer_class(self):
+        cedula = self.get_object() if self.action in ['retrieve', 'update'] else None
+        tipo = cedula.tipo if cedula else self.request.data.get('tipo')
+
+        if tipo == Cedula.CV_SINTETICO:
+            return CedulaCvSinteticoSerializer
+        return CedulaOrganizacionCurricularSerializer
+        #checar la seleccion del tipo de cedula y regresar el serializer adecuado
