@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 
-from cedulas.serializers import CedulaCvSinteticoSerializer, CedulaOrganizacionCurricularSerializer, CedulaPlanMejoraSerializer, CedulaValoracionObjetivosSerializer
+from cedulas.serializers import CedulaAEPVsAECACEISerializer, CedulaCvSinteticoSerializer, CedulaOrganizacionCurricularSerializer, CedulaPlanMejoraSerializer, CedulaValoracionObjetivosSerializer
 from cedulas.models import Cedula
 
 class CedulaViewSet(viewsets.ModelViewSet):
@@ -16,6 +16,8 @@ class CedulaViewSet(viewsets.ModelViewSet):
                 return CedulaPlanMejoraSerializer
             elif cedula.tipo == Cedula.VALORACION_OBJETIVOS:
                 return CedulaValoracionObjetivosSerializer
+            elif cedula.tipo == Cedula.AEP_VS_AECACEI:
+                return CedulaAEPVsAECACEISerializer
             return CedulaOrganizacionCurricularSerializer
         
         # Para create/list, usa el tipo desde request
@@ -27,4 +29,6 @@ class CedulaViewSet(viewsets.ModelViewSet):
             return CedulaPlanMejoraSerializer
         elif tipo == Cedula.VALORACION_OBJETIVOS:
             return CedulaValoracionObjetivosSerializer
+        elif tipo == Cedula.AEP_VS_AECACEI:
+            return CedulaAEPVsAECACEISerializer
         return CedulaOrganizacionCurricularSerializer

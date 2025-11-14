@@ -6,12 +6,14 @@ class Cedula(models.Model):
     CV_SINTETICO = 'cv_sintetico'
     PLAN_MEJORA = 'plan_mejora'
     VALORACION_OBJETIVOS = 'valoracion_objetivos'
+    AEP_VS_AECACEI = 'aep_vs_aecacei'
 
     TIPO_CHOICES = [
         (ORGANIZACION_CURRICULAR, 'Organización Curricular'),
         (CV_SINTETICO, 'CV Sintético'),
         (PLAN_MEJORA, 'Plan de Mejora'),
         (VALORACION_OBJETIVOS, 'Valoración de Objetivos'),
+        (AEP_VS_AECACEI, 'AEP vs AE-CACEI'),
     ]
     
     programa = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, null=True, blank=True)
@@ -156,6 +158,31 @@ class Cedula(models.Model):
             CriterioDesempenoCedula.objects.bulk_create(criterios)
             IndicadorCedula.objects.bulk_create(indicadores)
             EvaluacionIndicadorCedula.objects.bulk_create(evaluaciones)
+        
+        if self.tipo == Cedula.AEP_VS_AECACEI and self.programa:
+            # Limpiar snapshots previos
+            AtributoPECedula.objects.filter(cedula=self).delete()
+            AtributoPECACEICedula.objects.filter(cedula=self).delete()
+            
+            # Congelar atributos PE del programa
+            atributos_pe = self.programa.atributope_set.all()
+            AtributoPECedula.objects.bulk_create([
+                AtributoPECedula(cedula=self, atributo_pe=a) for a in atributos_pe
+            ])
+            
+            # Congelar relaciones con atributos CACEI
+            relaciones = []
+            for a in atributos_pe:
+                for rel in a.atributopecacei_set.all():
+                    relaciones.append(
+                        AtributoPECACEICedula(
+                            cedula=self,
+                            atributo_pe=a,
+                            atributo_cacei=rel.atributo_cacei,
+                            relacion=rel
+                        )
+                    )
+            AtributoPECACEICedula.objects.bulk_create(relaciones)
     
     def __str__(self):
         return f"Cédula {self.tipo} - {self.id}"
@@ -315,6 +342,24 @@ class EvaluacionIndicadorCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     indicador = models.ForeignKey('evaluacion_acreditacion.Indicador', on_delete=models.PROTECT)
     evaluacion = models.ForeignKey('evaluacion_acreditacion.EvaluacionIndicador', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+# AEP vs AE-CACEI MODELS
+
+class AtributoPECedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AtributoPECACEICedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
+    atributo_cacei = models.ForeignKey('gestion_academica.AtributoCACEI', on_delete=models.PROTECT)
+    relacion = models.ForeignKey('gestion_academica.AtributoPECACEI', on_delete=models.PROTECT)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
