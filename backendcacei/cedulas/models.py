@@ -1,7 +1,5 @@
 from django.db import models
 
-from core.models import Curso, Periodo, ProgramaEducativo, Profesor
-
 # Create your models here.
 class Cedula(models.Model):
     ORGANIZACION_CURRICULAR = 'organizacion_curricular'
@@ -12,9 +10,9 @@ class Cedula(models.Model):
         (CV_SINTETICO, 'CV Sintético'),
     ]
     
-    programa = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, null=True, blank=True)
-    periodo = models.ForeignKey(Periodo, on_delete=models.PROTECT, null=True, blank=True)
-    profesor = models.ForeignKey(Profesor, on_delete=models.PROTECT, null=True, blank=True)
+    programa = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, null=True, blank=True)
+    periodo = models.ForeignKey('core.Periodo', on_delete=models.PROTECT, null=True, blank=True)
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, null=True, blank=True)
     
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=ORGANIZACION_CURRICULAR)
     
@@ -42,14 +40,75 @@ class Cedula(models.Model):
             CursoOptativo.objects.bulk_create([
                 CursoOptativo(cedula=self, curso=curso) for curso in optativos
             ])
+        
+        if self.tipo == Cedula.CV_SINTETICO and self.profesor:
+            ActualizacionDisciplinarCedula.objects.filter(cedula=self).delete()
+            FormacionAcademicaCedula.objects.filter(cedula=self).delete()
+            CapacitacionDocenteCedula.objects.filter(cedula=self).delete()
+            ExperienciaProfesionalCedula.objects.filter(cedula=self).delete()
+            ExperienciaDisenoCedula.objects.filter(cedula=self).delete()
+            LogroProfesionalCedula.objects.filter(cedula=self).delete()
+            ParticipacionOrganizacionesCedula.objects.filter(cedula=self).delete()
+            PremioDistincionCedula.objects.filter(cedula=self).delete()
+            ProductoAcademicoCedula.objects.filter(cedula=self).delete()
+            AportacionPECedula.objects.filter(cedula=self).delete()
+            GestionAcademicaCedula.objects.filter(cedula=self).delete()
+            
+            # Crear snapshots de las relaciones actuales del profesor
+            ActualizacionDisciplinarCedula.objects.bulk_create([
+                ActualizacionDisciplinarCedula(cedula=self, actualizacion=a)
+                for a in self.profesor.actualizaciondisciplinar_set.all()
+            ])
+            FormacionAcademicaCedula.objects.bulk_create([
+                FormacionAcademicaCedula(cedula=self, formacion=f)
+                for f in self.profesor.formacionacademica_set.all()
+            ])
+            CapacitacionDocenteCedula.objects.bulk_create([
+                CapacitacionDocenteCedula(cedula=self, capacitacion=c)
+                for c in self.profesor.capacitaciondocente_set.all()
+            ])
+            ExperienciaProfesionalCedula.objects.bulk_create([
+                ExperienciaProfesionalCedula(cedula=self, experiencia=e)
+                for e in self.profesor.experienciaprofesional_set.all()
+            ])
+            ExperienciaDisenoCedula.objects.bulk_create([
+                ExperienciaDisenoCedula(cedula=self, experiencia=e)
+                for e in self.profesor.experienciadiseno_set.all()
+            ])
+            LogroProfesionalCedula.objects.bulk_create([
+                LogroProfesionalCedula(cedula=self, logro=l)
+                for l in self.profesor.logroprofesional_set.all()
+            ])
+            ParticipacionOrganizacionesCedula.objects.bulk_create([
+                ParticipacionOrganizacionesCedula(cedula=self, participacion=p)
+                for p in self.profesor.participacionorganizaciones_set.all()
+            ])
+            PremioDistincionCedula.objects.bulk_create([
+                PremioDistincionCedula(cedula=self, premio=pr)
+                for pr in self.profesor.premiodistincion_set.all()
+            ])
+            ProductoAcademicoCedula.objects.bulk_create([
+                ProductoAcademicoCedula(cedula=self, producto=pa)
+                for pa in self.profesor.productoacademico_set.all()
+            ])
+            AportacionPECedula.objects.bulk_create([
+                AportacionPECedula(cedula=self, aportacion=ap)
+                for ap in self.profesor.aportacionpe_set.all()
+            ])
+            GestionAcademicaCedula.objects.bulk_create([
+                GestionAcademicaCedula(cedula=self, gestion=g)
+                for g in self.profesor.gestionacademica_set.all()
+            ])
     
     def __str__(self):
-        return f"Cédula {self.tipo} - {self.programa.nombre} ({self.periodo.nombre})"
+        return f"Cédula {self.tipo} - {self.id}"
+
+# ORGANIZACION CURRICULAR MODELS
 
 class CursoObligatorio(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
-    curso = models.ForeignKey(Curso, on_delete=models.PROTECT)
-
+    curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -58,10 +117,89 @@ class CursoObligatorio(models.Model):
 
 class CursoOptativo(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
-    curso = models.ForeignKey(Curso, on_delete=models.PROTECT)
+    curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.curso.nombre} (Optativo)"
+
+# CV SINTETICO MODELS
+
+class ActualizacionDisciplinarCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    actualizacion = models.ForeignKey('gestion_de_profesores.ActualizacionDisciplinar', on_delete=models.PROTECT)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"{self.curso.nombre} (Optativo)"
+class FormacionAcademicaCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    formacion = models.ForeignKey('gestion_de_profesores.FormacionAcademica', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CapacitacionDocenteCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    capacitacion = models.ForeignKey('gestion_de_profesores.CapacitacionDocente', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ExperienciaProfesionalCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    experiencia = models.ForeignKey('gestion_de_profesores.ExperienciaProfesional', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ExperienciaDisenoCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    experiencia = models.ForeignKey('gestion_de_profesores.ExperienciaDiseno', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class LogroProfesionalCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    logro = models.ForeignKey('gestion_de_profesores.LogroProfesional', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ParticipacionOrganizacionesCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    participacion = models.ForeignKey('gestion_de_profesores.ParticipacionOrganizaciones', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class PremioDistincionCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    premio = models.ForeignKey('gestion_de_profesores.PremioDistincion', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ProductoAcademicoCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    producto = models.ForeignKey('gestion_de_profesores.ProductoAcademico', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AportacionPECedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    aportacion = models.ForeignKey('evaluacion_acreditacion.AportacionPE', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class GestionAcademicaCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    gestion = models.ForeignKey('evaluacion_acreditacion.GestionAcademica', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
