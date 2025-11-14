@@ -5,11 +5,13 @@ class Cedula(models.Model):
     ORGANIZACION_CURRICULAR = 'organizacion_curricular'
     CV_SINTETICO = 'cv_sintetico'
     PLAN_MEJORA = 'plan_mejora'
+    VALORACION_OBJETIVOS = 'valoracion_objetivos'
 
     TIPO_CHOICES = [
         (ORGANIZACION_CURRICULAR, 'Organización Curricular'),
         (CV_SINTETICO, 'CV Sintético'),
         (PLAN_MEJORA, 'Plan de Mejora'),
+        (VALORACION_OBJETIVOS, 'Valoración de Objetivos'),
     ]
     
     programa = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, null=True, blank=True)
@@ -119,6 +121,41 @@ class Cedula(models.Model):
                 for a in h.accionmejora_set.all():
                     acciones.append(AccionMejoraCedula(cedula=self, hallazgo=h, accion=a))
             AccionMejoraCedula.objects.bulk_create(acciones)
+        
+        if self.tipo == Cedula.VALORACION_OBJETIVOS and self.programa:
+            # Limpiar snapshots previos
+            ObjetivoEducacionalCedula.objects.filter(cedula=self).delete()
+            AtributoObjetivoCedula.objects.filter(cedula=self).delete()
+            CriterioDesempenoCedula.objects.filter(cedula=self).delete()
+            IndicadorCedula.objects.filter(cedula=self).delete()
+            EvaluacionIndicadorCedula.objects.filter(cedula=self).delete()
+            
+            # Congelar objetivos
+            objetivos = self.programa.objetivoeducacional_set.all()
+            ObjetivoEducacionalCedula.objects.bulk_create([
+                ObjetivoEducacionalCedula(cedula=self, objetivo=o) for o in objetivos
+            ])
+            
+            atributos, criterios, indicadores, evaluaciones = [], [], [], []
+            
+            for o in objetivos:
+                # Paso por atributos_pe_objetivos
+                for rel in o.atributopeobjetivo_set.all():
+                    atributos.append(AtributoObjetivoCedula(cedula=self, objetivo=o, atributo=rel.atributo_pe))
+                    # Desde atributo_pe llego a criterios
+                    for c in rel.atributo_pe.criteriodesempeno_set.all():
+                        criterios.append(CriterioDesempenoCedula(cedula=self, atributo=rel.atributo_pe, criterio=c))
+                        # Desde criterio llego a indicadores
+                        for i in c.indicador_set.all():
+                            indicadores.append(IndicadorCedula(cedula=self, criterio=c, indicador=i))
+                            # Desde indicador llego a evaluaciones
+                            for e in i.evaluacionindicador_set.all():
+                                evaluaciones.append(EvaluacionIndicadorCedula(cedula=self, indicador=i, evaluacion=e))
+            
+            AtributoObjetivoCedula.objects.bulk_create(atributos)
+            CriterioDesempenoCedula.objects.bulk_create(criterios)
+            IndicadorCedula.objects.bulk_create(indicadores)
+            EvaluacionIndicadorCedula.objects.bulk_create(evaluaciones)
     
     def __str__(self):
         return f"Cédula {self.tipo} - {self.id}"
@@ -237,6 +274,47 @@ class AccionMejoraCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     hallazgo = models.ForeignKey('evaluacion_acreditacion.Hallazgo', on_delete=models.PROTECT)
     accion = models.ForeignKey('evaluacion_acreditacion.AccionMejora', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+# VALORACION DE OBJETIVOS MODELS
+
+class ObjetivoEducacionalCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    objetivo = models.ForeignKey('gestion_academica.ObjetivoEducacional', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AtributoObjetivoCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    objetivo = models.ForeignKey('gestion_academica.ObjetivoEducacional', on_delete=models.PROTECT)
+    atributo = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CriterioDesempenoCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    atributo = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
+    criterio = models.ForeignKey('gestion_academica.CriterioDesempeno', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class IndicadorCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    criterio = models.ForeignKey('gestion_academica.CriterioDesempeno', on_delete=models.PROTECT)
+    indicador = models.ForeignKey('evaluacion_acreditacion.Indicador', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class EvaluacionIndicadorCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    indicador = models.ForeignKey('evaluacion_acreditacion.Indicador', on_delete=models.PROTECT)
+    evaluacion = models.ForeignKey('evaluacion_acreditacion.EvaluacionIndicador', on_delete=models.PROTECT)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

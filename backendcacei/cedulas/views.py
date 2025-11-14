@@ -1,15 +1,7 @@
 from rest_framework import viewsets
 
-from cedulas.serializers import  CursoObligatorioSerializer, CursoOptativoSerializer, CedulaCvSinteticoSerializer, CedulaOrganizacionCurricularSerializer
-from cedulas.models import Cedula, CursoObligatorio, CursoOptativo
-
-class CursoObligatorioViewSet(viewsets.ModelViewSet):
-    queryset = CursoObligatorio.objects.all()
-    serializer_class = CursoObligatorioSerializer
-
-class CursoOptativoViewSet(viewsets.ModelViewSet):
-    queryset = CursoOptativo.objects.all()
-    serializer_class = CursoOptativoSerializer
+from cedulas.serializers import CedulaCvSinteticoSerializer, CedulaOrganizacionCurricularSerializer, CedulaPlanMejoraSerializer, CedulaValoracionObjetivosSerializer
+from cedulas.models import Cedula
 
 class CedulaViewSet(viewsets.ModelViewSet):
     queryset = Cedula.objects.all()
@@ -20,11 +12,19 @@ class CedulaViewSet(viewsets.ModelViewSet):
             cedula = self.get_object()
             if cedula.tipo == Cedula.CV_SINTETICO:
                 return CedulaCvSinteticoSerializer
+            elif cedula.tipo == Cedula.PLAN_MEJORA:
+                return CedulaPlanMejoraSerializer
+            elif cedula.tipo == Cedula.VALORACION_OBJETIVOS:
+                return CedulaValoracionObjetivosSerializer
             return CedulaOrganizacionCurricularSerializer
-
+        
         # Para create/list, usa el tipo desde request
         # /api/cedulas/?tipo=X
         tipo = self.request.data.get("tipo") or self.request.query_params.get("tipo")
         if tipo == Cedula.CV_SINTETICO:
             return CedulaCvSinteticoSerializer
+        elif tipo == Cedula.PLAN_MEJORA:
+            return CedulaPlanMejoraSerializer
+        elif tipo == Cedula.VALORACION_OBJETIVOS:
+            return CedulaValoracionObjetivosSerializer
         return CedulaOrganizacionCurricularSerializer

@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
-from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, CapacitacionDocenteCedula, Cedula, CursoObligatorio, CursoOptativo, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, LogroProfesionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
+from gestion_academica.serializers import AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer
+from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoObligatorio, CursoOptativo, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
 from core.models import Periodo, Profesor, ProgramaEducativo
 
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer
 from core.serializers import CursoSerializer, PeriodoSerializer, ProgramaEducativoSerializer, ProfesorSerializer
-from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer, HallazgoSerializer
+from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, EvaluacionIndicadorSerializer, GestionAcademicaSerializer, HallazgoSerializer, IndicadorSerializer
 
 class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
     programa = ProgramaEducativoSerializer(read_only=True)
@@ -27,6 +28,7 @@ class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
             "cursos_obligatorios",
             "cursos_optativos",
         ]
+        read_only_fields = ["id"]
     
     def get_cursos_obligatorios(self, obj):
         relaciones = CursoObligatorio.objects.filter(cedula=obj)
@@ -42,7 +44,6 @@ class CursoOptativoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CursoOptativo
         fields = ["id", "curso"]
-        read_only_fields = ["id"]
 
 class CursoObligatorioSerializer(serializers.ModelSerializer):
     curso = CursoSerializer(read_only=True)
@@ -50,7 +51,6 @@ class CursoObligatorioSerializer(serializers.ModelSerializer):
     class Meta:
         model = CursoObligatorio
         fields = ["id", "curso"]
-        read_only_fields = ["id"]
 
 class CedulaCvSinteticoSerializer(serializers.ModelSerializer):
     profesor = ProfesorSerializer(read_only=True)
@@ -78,6 +78,7 @@ class CedulaCvSinteticoSerializer(serializers.ModelSerializer):
             "disenos", "logros", "participaciones", "premios", "productos", 
             "aportaciones_pe", "gestiones"
         ]
+        read_only_fields = ["id"]
     
     def get_actualizaciones(self, obj):
         relaciones = ActualizacionDisciplinarCedula.objects.filter(cedula=obj)
@@ -129,7 +130,6 @@ class ActualizacionDisciplinarCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActualizacionDisciplinarCedula
         fields = ["id", "actualizacion"]
-        read_only_fields = ["id"]
 
 class FormacionAcademicaCedulaSerializer(serializers.ModelSerializer):
     formacion = FormacionAcademicaSerializer(read_only=True)
@@ -137,7 +137,6 @@ class FormacionAcademicaCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormacionAcademicaCedula
         fields = ["id", "formacion"]
-        read_only_fields = ["id"]
 
 class CapacitacionDocenteCedulaSerializer(serializers.ModelSerializer):
     capacitacion = CapacitacionDocenteSerializer(read_only=True)
@@ -145,7 +144,6 @@ class CapacitacionDocenteCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = CapacitacionDocenteCedula
         fields = ["id", "capacitacion"]
-        read_only_fields = ["id"]
 
 class ExperienciaProfesionalCedulaSerializer(serializers.ModelSerializer):
     experiencia = ExperienciaProfesionalSerializer(read_only=True)
@@ -153,7 +151,6 @@ class ExperienciaProfesionalCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperienciaProfesionalCedula
         fields = ["id", "experiencia"]
-        read_only_fields = ["id"]
 
 class ExperienciaDisenoCedulaSerializer(serializers.ModelSerializer):
     experiencia = ExperienciaDisenoSerializer(read_only=True)
@@ -161,7 +158,6 @@ class ExperienciaDisenoCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperienciaDisenoCedula
         fields = ["id", "experiencia"]
-        read_only_fields = ["id"]
 
 class LogroProfesionalCedulaSerializer(serializers.ModelSerializer):
     logro = LogroProfesionalSerializer(read_only=True)
@@ -169,7 +165,6 @@ class LogroProfesionalCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = LogroProfesionalCedula
         fields = ["id", "logro"]
-        read_only_fields = ["id"]
 
 class ParticipacionOrganizacionesCedulaSerializer(serializers.ModelSerializer):
     participacion = ParticipacionOrganizacionesSerializer(read_only=True)
@@ -177,7 +172,6 @@ class ParticipacionOrganizacionesCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParticipacionOrganizacionesCedula
         fields = ["id", "participacion"]
-        read_only_fields = ["id"]
 
 class PremioDistincionCedulaSerializer(serializers.ModelSerializer):
     premio = PremioDistincionSerializer(read_only=True)
@@ -185,7 +179,6 @@ class PremioDistincionCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = PremioDistincionCedula
         fields = ["id", "premio"]
-        read_only_fields = ["id"]
 
 class ProductoAcademicoCedulaSerializer(serializers.ModelSerializer):
     producto = ProductoAcademicoSerializer(read_only=True)
@@ -193,7 +186,6 @@ class ProductoAcademicoCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductoAcademicoCedula
         fields = ["id", "producto"]
-        read_only_fields = ["id"]
 
 class AportacionPECedulaSerializer(serializers.ModelSerializer):
     aportacion = AportacionPESerializer(read_only=True)
@@ -201,7 +193,6 @@ class AportacionPECedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = AportacionPECedula
         fields = ["id", "aportacion"]
-        read_only_fields = ["id"]
 
 class GestionAcademicaCedulaSerializer(serializers.ModelSerializer):
     gestion = GestionAcademicaSerializer(read_only=True)
@@ -209,7 +200,6 @@ class GestionAcademicaCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = GestionAcademicaCedula
         fields = ["id", "gestion"]
-        read_only_fields = ["id"]
 
 class CedulaPlanMejoraSerializer(serializers.ModelSerializer):
     programa = ProgramaEducativoSerializer(read_only=True)
@@ -240,7 +230,6 @@ class HallazgoCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = HallazgoCedula
         fields = ["id", "hallazgo"]
-        read_only_fields = ["id"]
 
 class AccionMejoraCedulaSerializer(serializers.ModelSerializer):
     accion = AccionMejoraSerializer(read_only=True)
@@ -248,4 +237,78 @@ class AccionMejoraCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccionMejoraCedula
         fields = ["id", "accion"]
+
+class CedulaValoracionObjetivosSerializer(serializers.ModelSerializer):
+    programa = ProgramaEducativoSerializer(read_only=True)
+    periodo = PeriodoSerializer(read_only=True)
+    programa_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProgramaEducativo.objects.all(), source='programa', write_only=True
+    )
+    periodo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Periodo.objects.all(), source='periodo', write_only=True
+    )
+    objetivos = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Cedula
+        fields = ["id", "tipo", "programa", "periodo", "programa_id", "periodo_id", "objetivos"]
         read_only_fields = ["id"]
+    
+    def get_objetivos(self, obj):
+        relaciones = ObjetivoEducacionalCedula.objects.filter(cedula=obj)
+        return ObjetivoEducacionalCedulaSerializer(relaciones, many=True).data
+
+class EvaluacionIndicadorCedulaSerializer(serializers.ModelSerializer):
+    evaluacion = EvaluacionIndicadorSerializer(read_only=True)
+    
+    class Meta:
+        model = EvaluacionIndicadorCedula
+        fields = ["id", "evaluacion"]
+
+class IndicadorCedulaSerializer(serializers.ModelSerializer):
+    indicador = IndicadorSerializer(read_only=True)
+    evaluaciones = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = IndicadorCedula
+        fields = ["id", "indicador", "evaluaciones"]
+        
+    def get_evaluaciones(self, obj):
+        relaciones = EvaluacionIndicadorCedula.objects.filter(cedula=obj.cedula, indicador=obj.indicador)
+        return EvaluacionIndicadorCedulaSerializer(relaciones, many=True).data
+
+class CriterioCedulaSerializer(serializers.ModelSerializer):
+    criterio = CriterioDesempenoSerializer(read_only=True)
+    indicadores = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CriterioDesempenoCedula
+        fields = ["id", "criterio", "indicadores"]
+        
+    def get_indicadores(self, obj):
+        relaciones = IndicadorCedula.objects.filter(cedula=obj.cedula, criterio=obj.criterio)
+        return IndicadorCedulaSerializer(relaciones, many=True).data
+
+class AtributoObjetivoCedulaSerializer(serializers.ModelSerializer):
+    atributo = AtributoPESerializer(read_only=True)
+    criterios = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AtributoObjetivoCedula
+        fields = ["id", "atributo", "criterios"]
+    
+    def get_criterios(self, obj):
+        relaciones = CriterioDesempenoCedula.objects.filter(cedula=obj.cedula, atributo=obj.atributo)
+        return CriterioCedulaSerializer(relaciones, many=True).data
+
+class ObjetivoEducacionalCedulaSerializer(serializers.ModelSerializer):
+    objetivo = ObjetivoEducacionalSerializer(read_only=True)
+    atributos = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ObjetivoEducacionalCedula
+        fields = ["id", "objetivo", "atributos"]
+    
+    def get_atributos(self, obj):
+        relaciones = AtributoObjetivoCedula.objects.filter(cedula=obj.cedula, objetivo=obj.objetivo)
+        return AtributoObjetivoCedulaSerializer(relaciones, many=True).data
