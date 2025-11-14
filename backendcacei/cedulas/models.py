@@ -15,6 +15,7 @@ class Cedula(models.Model):
     programa = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT, null=True, blank=True)
     periodo = models.ForeignKey(Periodo, on_delete=models.PROTECT, null=True, blank=True)
     profesor = models.ForeignKey(Profesor, on_delete=models.PROTECT, null=True, blank=True)
+    
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=ORGANIZACION_CURRICULAR)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -24,7 +25,7 @@ class Cedula(models.Model):
         # Guardar la cédula primero
         super().save(*args, **kwargs)
         
-        if self.programa:
+        if self.tipo == Cedula.ORGANIZACION_CURRICULAR and self.programa:
             cursos = self.programa.curso_set.all()
             
             obligatorios = cursos.filter(tipo='obligatorio')
@@ -64,6 +65,3 @@ class CursoOptativo(models.Model):
 
     def __str__(self):
         return f"{self.curso.nombre} (Optativo)"
-    
-
-
