@@ -7,6 +7,7 @@ class Cedula(models.Model):
     PLAN_MEJORA = 'plan_mejora'
     VALORACION_OBJETIVOS = 'valoracion_objetivos'
     AEP_VS_AECACEI = 'aep_vs_aecacei'
+    AEP_VS_OE = 'aep_vs_oe'
 
     TIPO_CHOICES = [
         (ORGANIZACION_CURRICULAR, 'Organización Curricular'),
@@ -14,6 +15,7 @@ class Cedula(models.Model):
         (PLAN_MEJORA, 'Plan de Mejora'),
         (VALORACION_OBJETIVOS, 'Valoración de Objetivos'),
         (AEP_VS_AECACEI, 'AEP vs AE-CACEI'),
+        (AEP_VS_OE, 'AEP vs OE'),
     ]
     
     programa = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, null=True, blank=True)
@@ -183,6 +185,31 @@ class Cedula(models.Model):
                         )
                     )
             AtributoPECACEICedula.objects.bulk_create(relaciones)
+        
+        if self.tipo == Cedula.AEP_VS_OE and self.programa:
+            # Limpiar snapshots previos
+            AtributoPECedula.objects.filter(cedula=self).delete()
+            AtributoObjetivoCedulaAEPVsOE.objects.filter(cedula=self).delete()
+            
+            # Congelar atributos PE del programa
+            atributos_pe = self.programa.atributope_set.all()
+            AtributoPECedula.objects.bulk_create([
+                AtributoPECedula(cedula=self, atributo_pe=a) for a in atributos_pe
+            ])
+            
+            # Congelar relaciones con objetivos educacionales
+            relaciones = []
+            for a in atributos_pe:
+                for rel in a.atributopeobjetivo_set.all():
+                    relaciones.append(
+                        AtributoObjetivoCedulaAEPVsOE(
+                            cedula=self,
+                            atributo_pe=a,
+                            objetivo=rel.objetivo,
+                            relacion=rel
+                        )
+                    )
+            AtributoObjetivoCedulaAEPVsOE.objects.bulk_create(relaciones)
     
     def __str__(self):
         return f"Cédula {self.tipo} - {self.id}"
@@ -360,6 +387,17 @@ class AtributoPECACEICedula(models.Model):
     atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
     atributo_cacei = models.ForeignKey('gestion_academica.AtributoCACEI', on_delete=models.PROTECT)
     relacion = models.ForeignKey('gestion_academica.AtributoPECACEI', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+# AEP vs OE MODELS
+
+class AtributoObjetivoCedulaAEPVsOE(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    objetivo = models.ForeignKey('gestion_academica.ObjetivoEducacional', on_delete=models.PROTECT)
+    atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
+    relacion = models.ForeignKey('gestion_academica.AtributoPEObjetivo', on_delete=models.PROTECT)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

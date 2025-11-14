@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer
-from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoPECACEICedula, AtributoPECedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoObligatorio, CursoOptativo, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
+from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, ObjetivoEducacionalSerializer
+from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoObligatorio, CursoOptativo, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
 from core.models import Periodo, Profesor, ProgramaEducativo
 
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer
@@ -352,3 +352,45 @@ class AtributoPECedulaSerializer(serializers.ModelSerializer):
     def get_relaciones_cacei(self, obj):
         relaciones = AtributoPECACEICedula.objects.filter(cedula=obj.cedula, atributo_pe=obj.atributo_pe)
         return AtributoPECACEICedulaSerializer(relaciones, many=True).data
+
+class CedulaAEPVsOESerializer(serializers.ModelSerializer):
+    programa = ProgramaEducativoSerializer(read_only=True)
+    periodo = PeriodoSerializer(read_only=True)
+    programa_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProgramaEducativo.objects.all(), source='programa', write_only=True
+    )
+    periodo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Periodo.objects.all(), source='periodo', write_only=True
+    )
+    atributos_pe = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Cedula
+        fields = ["id", "tipo", "programa", "programa_id", "periodo", "periodo_id", "atributos_pe"]
+    
+    def get_atributos_pe(self, obj):
+        relaciones = AtributoPECedula.objects.filter(cedula=obj)
+        return AtributoPECedulaAEPVsOESerializer(relaciones, many=True).data
+
+class AtributoObjetivoCedulaAEPVsOESerializer(serializers.ModelSerializer):
+    atributo_pe = AtributoPESerializer(read_only=True)
+    objetivo = ObjetivoEducacionalSerializer(read_only=True)
+    relacion = AtributoPEObjetivoSerializer(read_only=True)
+    
+    class Meta:
+        model = AtributoObjetivoCedulaAEPVsOE
+        fields = ["id", "atributo_pe", "objetivo", "relacion"]
+
+class AtributoPECedulaAEPVsOESerializer(serializers.ModelSerializer):
+    atributo_pe = AtributoPESerializer(read_only=True)
+    objetivos = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AtributoPECedula
+        fields = ["id", "atributo_pe", "objetivos"]
+    
+    def get_objetivos(self, obj):
+        relaciones = AtributoObjetivoCedulaAEPVsOE.objects.filter(
+            cedula=obj.cedula, atributo_pe=obj.atributo_pe
+        )
+        return AtributoObjetivoCedulaAEPVsOESerializer(relaciones, many=True).data
