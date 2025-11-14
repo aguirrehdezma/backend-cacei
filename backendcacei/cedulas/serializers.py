@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from cedulas.models import ActualizacionDisciplinarCedula, AportacionPECedula, CapacitacionDocenteCedula, Cedula, CursoObligatorio, CursoOptativo, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, LogroProfesionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
+from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, CapacitacionDocenteCedula, Cedula, CursoObligatorio, CursoOptativo, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, LogroProfesionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
 from core.models import Periodo, Profesor, ProgramaEducativo
 
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer
 from core.serializers import CursoSerializer, PeriodoSerializer, ProgramaEducativoSerializer, ProfesorSerializer
-from evaluacion_acreditacion.serializers import AportacionPESerializer, GestionAcademicaSerializer
+from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, GestionAcademicaSerializer, HallazgoSerializer
 
 class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
     programa = ProgramaEducativoSerializer(read_only=True)
@@ -209,4 +209,43 @@ class GestionAcademicaCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = GestionAcademicaCedula
         fields = ["id", "gestion"]
+        read_only_fields = ["id"]
+
+class CedulaPlanMejoraSerializer(serializers.ModelSerializer):
+    programa = ProgramaEducativoSerializer(read_only=True)
+    periodo = PeriodoSerializer(read_only=True)
+    programa_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProgramaEducativo.objects.all(), source='programa', write_only=True
+    )
+    periodo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Periodo.objects.all(), source='periodo', write_only=True
+    )
+    hallazgos = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cedula
+        fields = [
+            "id", "tipo", "programa", "periodo", "programa_id", "periodo_id",
+            "hallazgos"
+        ]
+        read_only_fields = ["id"]
+    
+    def get_hallazgos(self, obj):
+        relaciones = HallazgoCedula.objects.filter(cedula=obj)
+        return HallazgoCedulaSerializer(relaciones, many=True).data
+
+class HallazgoCedulaSerializer(serializers.ModelSerializer):
+    hallazgo = HallazgoSerializer(read_only=True)
+
+    class Meta:
+        model = HallazgoCedula
+        fields = ["id", "hallazgo"]
+        read_only_fields = ["id"]
+
+class AccionMejoraCedulaSerializer(serializers.ModelSerializer):
+    accion = AccionMejoraSerializer(read_only=True)
+    
+    class Meta:
+        model = AccionMejoraCedula
+        fields = ["id", "accion"]
         read_only_fields = ["id"]

@@ -4,10 +4,12 @@ from django.db import models
 class Cedula(models.Model):
     ORGANIZACION_CURRICULAR = 'organizacion_curricular'
     CV_SINTETICO = 'cv_sintetico'
+    PLAN_MEJORA = 'plan_mejora'
 
     TIPO_CHOICES = [
         (ORGANIZACION_CURRICULAR, 'Organización Curricular'),
         (CV_SINTETICO, 'CV Sintético'),
+        (PLAN_MEJORA, 'Plan de Mejora'),
     ]
     
     programa = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, null=True, blank=True)
@@ -99,6 +101,24 @@ class Cedula(models.Model):
                 GestionAcademicaCedula(cedula=self, gestion=g)
                 for g in self.profesor.gestionacademica_set.all()
             ])
+        
+        if self.tipo == Cedula.PLAN_MEJORA and self.programa:
+            # Limpiar snapshots previos
+            HallazgoCedula.objects.filter(cedula=self).delete()
+            AccionMejoraCedula.objects.filter(cedula=self).delete()
+            
+            # Congelar hallazgos
+            hallazgos = self.programa.hallazgo_set.all()
+            HallazgoCedula.objects.bulk_create([
+                HallazgoCedula(cedula=self, hallazgo=h) for h in hallazgos
+            ])
+            
+            # Congelar acciones de mejora ligadas a cada hallazgo
+            acciones = []
+            for h in hallazgos:
+                for a in h.accionmejora_set.all():
+                    acciones.append(AccionMejoraCedula(cedula=self, hallazgo=h, accion=a))
+            AccionMejoraCedula.objects.bulk_create(acciones)
     
     def __str__(self):
         return f"Cédula {self.tipo} - {self.id}"
@@ -200,6 +220,23 @@ class AportacionPECedula(models.Model):
 class GestionAcademicaCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     gestion = models.ForeignKey('evaluacion_acreditacion.GestionAcademica', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+# PLAN DE MEJORA MODELS
+
+class HallazgoCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    hallazgo = models.ForeignKey('evaluacion_acreditacion.Hallazgo', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class AccionMejoraCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    hallazgo = models.ForeignKey('evaluacion_acreditacion.Hallazgo', on_delete=models.PROTECT)
+    accion = models.ForeignKey('evaluacion_acreditacion.AccionMejora', on_delete=models.PROTECT)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
