@@ -5,7 +5,14 @@ from cedulas.models import Cedula
 
 class CedulaViewSet(viewsets.ModelViewSet):
     queryset = Cedula.objects.all()
-
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        tipo = self.request.query_params.get("tipo")
+        if tipo:
+            queryset = queryset.filter(tipo=tipo)
+        return queryset
+    
     def get_serializer_class(self):
         # Si es retrieve/update
         if self.action in ["retrieve", "update", "partial_update"]:
@@ -23,7 +30,6 @@ class CedulaViewSet(viewsets.ModelViewSet):
             return CedulaOrganizacionCurricularSerializer
         
         # Para create/list, usa el tipo desde request
-        # /api/cedulas/?tipo=X
         tipo = self.request.data.get("tipo") or self.request.query_params.get("tipo")
         if tipo == Cedula.CV_SINTETICO:
             return CedulaCvSinteticoSerializer
