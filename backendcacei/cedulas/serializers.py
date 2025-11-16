@@ -57,6 +57,10 @@ class CedulaCvSinteticoSerializer(serializers.ModelSerializer):
     profesor_id = serializers.PrimaryKeyRelatedField(
         queryset=Profesor.objects.all(), source='profesor', write_only=True
     )
+    periodo = PeriodoSerializer(read_only=True)
+    periodo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Periodo.objects.all(), source='periodo', write_only=True
+    )
     
     actualizaciones = ActualizacionDisciplinarSerializer(many=True, read_only=True)
     formaciones = serializers.SerializerMethodField()
@@ -73,7 +77,7 @@ class CedulaCvSinteticoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cedula
         fields = [
-            "id", "tipo", "profesor", "profesor_id",
+            "id", "tipo", "profesor", "profesor_id", "periodo", "periodo_id",
             "actualizaciones", "formaciones", "capacitaciones", "experiencias", 
             "disenos", "logros", "participaciones", "premios", "productos", 
             "aportaciones_pe", "gestiones"

@@ -19,7 +19,7 @@ class Cedula(models.Model):
     ]
     
     programa = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, null=True, blank=True)
-    periodo = models.ForeignKey('core.Periodo', on_delete=models.PROTECT, null=True, blank=True)
+    periodo = models.ForeignKey('core.Periodo', on_delete=models.PROTECT)
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, null=True, blank=True)
     
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=ORGANIZACION_CURRICULAR)
