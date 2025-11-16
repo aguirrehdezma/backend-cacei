@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 
-from cedulas.serializers import CedulaAEPVsAECACEISerializer, CedulaAEPVsOESerializer, CedulaCursosVsAEPSerializer, CedulaCvSinteticoSerializer, CedulaOrganizacionCurricularSerializer, CedulaPlanMejoraSerializer, CedulaValoracionObjetivosSerializer
+from cedulas.serializers import CedulaAEPVsAECACEISerializer, CedulaAEPVsOESerializer, CedulaCursosVsAEPSerializer, CedulaCvSinteticoSerializer, CedulaHerramientasValoracionAEPSerializer, CedulaOrganizacionCurricularSerializer, CedulaPlanMejoraSerializer, CedulaValoracionObjetivosSerializer
 from cedulas.models import Cedula
 
 class CedulaViewSet(viewsets.ModelViewSet):
@@ -29,6 +29,8 @@ class CedulaViewSet(viewsets.ModelViewSet):
                 return CedulaAEPVsOESerializer
             elif cedula.tipo == Cedula.CURSOS_VS_AEP:
                 return CedulaCursosVsAEPSerializer
+            elif cedula.tipo == Cedula.HERRAMIENTAS_VALORACION_AEP:
+                return CedulaHerramientasValoracionAEPSerializer
             return CedulaOrganizacionCurricularSerializer
         
         # Para create/list, usa el tipo desde request
@@ -45,4 +47,13 @@ class CedulaViewSet(viewsets.ModelViewSet):
             return CedulaAEPVsOESerializer
         elif tipo == Cedula.CURSOS_VS_AEP:
             return CedulaCursosVsAEPSerializer
+        elif tipo == Cedula.HERRAMIENTAS_VALORACION_AEP:
+            return CedulaHerramientasValoracionAEPSerializer
         return CedulaOrganizacionCurricularSerializer
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        cedula_tipo = self.request.data.get("tipo") or self.request.query_params.get("tipo")
+        # Incluir el curso en la serialización de EvaluacionIndicadorCedula
+        context["include_curso"] = cedula_tipo == Cedula.HERRAMIENTAS_VALORACION_AEP
+        return context

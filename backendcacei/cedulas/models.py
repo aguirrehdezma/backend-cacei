@@ -9,6 +9,7 @@ class Cedula(models.Model):
     AEP_VS_AECACEI = 'aep_vs_aecacei'
     AEP_VS_OE = 'aep_vs_oe'
     CURSOS_VS_AEP = 'cursos_vs_aep'
+    HERRAMIENTAS_VALORACION_AEP = 'herramientas_valoracion_aep'
     
     TIPO_CHOICES = [
         (ORGANIZACION_CURRICULAR, 'Organización Curricular'),
@@ -18,6 +19,7 @@ class Cedula(models.Model):
         (AEP_VS_AECACEI, 'AEP vs AE-CACEI'),
         (AEP_VS_OE, 'AEP vs OE'),
         (CURSOS_VS_AEP, 'Cursos vs AEP'),
+        (HERRAMIENTAS_VALORACION_AEP, 'Herramientas de Valoración de AEP'),
     ]
     
     programa = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, null=True, blank=True)
@@ -237,6 +239,55 @@ class Cedula(models.Model):
                         )
                     )
             CursoAtributoPECedula.objects.bulk_create(relaciones)
+        
+        if self.tipo == Cedula.HERRAMIENTAS_VALORACION_AEP and self.programa:
+            # Limpiar snapshots previos
+            AtributoPECedula.objects.filter(cedula=self).delete()
+            CriterioDesempenoCedula.objects.filter(cedula=self).delete()
+            IndicadorCedula.objects.filter(cedula=self).delete()
+            EvaluacionIndicadorCedula.objects.filter(cedula=self).delete()
+            
+            # Congelar atributos PE del programa
+            atributos_pe = self.programa.atributope_set.all()
+            AtributoPECedula.objects.bulk_create([
+                AtributoPECedula(cedula=self, atributo_pe=a) for a in atributos_pe
+            ])
+            
+            criterios, indicadores, evaluaciones = [], [], []
+            
+            for a in atributos_pe:
+                # Desde atributo llego a criterios
+                for c in a.criteriodesempeno_set.all():
+                    criterios.append(
+                        CriterioDesempenoCedula(
+                            cedula=self,
+                            atributo_pe=a,
+                            criterio=c
+                        )
+                    )
+                    # Desde criterio llego a indicadores
+                    for i in c.indicador_set.all():
+                        indicadores.append(
+                            IndicadorCedula(
+                                cedula=self,
+                                criterio=c,
+                                indicador=i
+                            )
+                        )
+                        # Desde indicador llego a evaluaciones
+                        for e in i.evaluacionindicador_set.all():
+                            evaluaciones.append(
+                                EvaluacionIndicadorCedula(
+                                    cedula=self,
+                                    indicador=i,
+                                    evaluacion=e
+                                )
+                            )
+            
+            # Guardar snapshots en bloque
+            CriterioDesempenoCedula.objects.bulk_create(criterios)
+            IndicadorCedula.objects.bulk_create(indicadores)
+            EvaluacionIndicadorCedula.objects.bulk_create(evaluaciones)
     
     def __str__(self):
         return f"Cédula {self.tipo} - {self.id}"

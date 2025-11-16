@@ -264,10 +264,17 @@ class CedulaValoracionObjetivosSerializer(serializers.ModelSerializer):
 
 class EvaluacionIndicadorCedulaSerializer(serializers.ModelSerializer):
     evaluacion = EvaluacionIndicadorSerializer(read_only=True)
+    curso = serializers.SerializerMethodField()
     
     class Meta:
         model = EvaluacionIndicadorCedula
-        fields = ["id", "evaluacion"]
+        fields = ["id", "evaluacion", "curso"]
+    
+    def get_curso(self, obj):
+        if self.context.get("include_curso", False):
+            if obj.evaluacion and obj.evaluacion.curso:
+                return CursoSerializer(obj.evaluacion.curso).data
+        return None
 
 class IndicadorCedulaSerializer(serializers.ModelSerializer):
     indicador = IndicadorSerializer(read_only=True)
@@ -279,7 +286,7 @@ class IndicadorCedulaSerializer(serializers.ModelSerializer):
         
     def get_evaluaciones(self, obj):
         relaciones = EvaluacionIndicadorCedula.objects.filter(cedula=obj.cedula, indicador=obj.indicador)
-        return EvaluacionIndicadorCedulaSerializer(relaciones, many=True).data
+        return EvaluacionIndicadorCedulaSerializer(relaciones, many=True, context=self.context).data
 
 class CriterioCedulaSerializer(serializers.ModelSerializer):
     criterio = CriterioDesempenoSerializer(read_only=True)
@@ -288,10 +295,10 @@ class CriterioCedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = CriterioDesempenoCedula
         fields = ["id", "criterio", "indicadores"]
-        
+
     def get_indicadores(self, obj):
         relaciones = IndicadorCedula.objects.filter(cedula=obj.cedula, criterio=obj.criterio)
-        return IndicadorCedulaSerializer(relaciones, many=True).data
+        return IndicadorCedulaSerializer(relaciones, many=True, context=self.context).data
 
 class AtributoObjetivoCedulaSerializer(serializers.ModelSerializer):
     atributo = AtributoPESerializer(read_only=True)
@@ -303,7 +310,7 @@ class AtributoObjetivoCedulaSerializer(serializers.ModelSerializer):
     
     def get_criterios(self, obj):
         relaciones = CriterioDesempenoCedula.objects.filter(cedula=obj.cedula, atributo=obj.atributo)
-        return CriterioCedulaSerializer(relaciones, many=True).data
+        return CriterioCedulaSerializer(relaciones, many=True, context=self.context).data
 
 class ObjetivoEducacionalCedulaSerializer(serializers.ModelSerializer):
     objetivo = ObjetivoEducacionalSerializer(read_only=True)
@@ -440,3 +447,36 @@ class CursoAtributoPECedulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = CursoAtributoPECedula
         fields = ["id", "curso", "atributo_pe", "relacion"]
+
+class AtributoPECedulaHerramientasSerializer(serializers.ModelSerializer):
+    atributo_pe = AtributoPESerializer(read_only=True)
+    criterios = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AtributoPECedula
+        fields = ["id", "atributo_pe", "criterios"]
+    
+    def get_criterios(self, obj):
+        relaciones = CriterioDesempenoCedula.objects.filter(
+            cedula=obj.cedula, atributo_pe=obj.atributo_pe
+        )
+        return CriterioCedulaSerializer(relaciones, many=True, context=self.context).data
+
+class CedulaHerramientasValoracionAEPSerializer(serializers.ModelSerializer):
+    programa = ProgramaEducativoSerializer(read_only=True)
+    periodo = PeriodoSerializer(read_only=True)
+    programa_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProgramaEducativo.objects.all(), source='programa', write_only=True
+    )
+    periodo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Periodo.objects.all(), source='periodo', write_only=True
+    )
+    atributos_pe = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Cedula
+        fields = ["id", "tipo", "programa", "programa_id", "periodo", "periodo_id", "atributos_pe"]
+    
+    def get_atributos_pe(self, obj):
+        relaciones = AtributoPECedula.objects.filter(cedula=obj)
+        return AtributoPECedulaHerramientasSerializer(relaciones, many=True).data
