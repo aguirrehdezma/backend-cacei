@@ -84,12 +84,24 @@ class Organizacion(models.Model):
         return self.nombre
 
 class Periodo(models.Model):
-    nombre = models.CharField(max_length=50)
+    SEMESTRE_CHOICES = [
+        ('EM', 'Enero-Mayo'),
+        ('AD', 'Agosto-Diciembre'),
+    ]
+    
+    semestre = models.CharField(max_length=2, choices=SEMESTRE_CHOICES)
+    anio = models.PositiveSmallIntegerField()
+    nombre = models.CharField(max_length=6, editable=False)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        # Generar nombre automáticamente antes de guardar
+        self.nombre = f"{self.semestre}{self.anio}"
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.nombre

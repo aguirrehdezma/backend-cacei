@@ -35,5 +35,5 @@ class OrganizacionSerializer(serializers.ModelSerializer):
 class PeriodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Periodo
-        fields = ['id', 'nombre', 'fecha_inicio', 'fecha_fin']
+        fields = ['id',  'semestre', 'anio', 'nombre', 'fecha_inicio', 'fecha_fin']
         read_only_fields = ['id']

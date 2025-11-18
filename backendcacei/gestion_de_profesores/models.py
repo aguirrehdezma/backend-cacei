@@ -12,15 +12,15 @@ class ProfesorCurso(models.Model):
 
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
+    periodo = models.ForeignKey('core.Periodo', on_delete=models.PROTECT)
     
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=RESPONSABLE)
-    periodo = models.CharField(max_length=50)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} imparte el curso {self.curso.clave}"
+        return f"{self.curso.clave} {self.curso.nombre} - {self.profesor.nombres} {self.profesor.apellidos} ({self.periodo.nombre})"
 
 class FormacionAcademica(models.Model):
     LICENCIATURA = 'licenciatura'
