@@ -1,11 +1,15 @@
 from django.contrib import admin
 
-from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoAtributoPECedula, CursoCedula, CursoObligatorio, CursoOptativo, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
+from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoAtributoPECedula, CursoCedula, CursoCurricular, CursoCurricularEje, CursoObligatorio, CursoObligatorioEje, CursoOptativo, CursoOptativoEje, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
 
 # Register your models here.
 admin.site.register(Cedula)
 admin.site.register(CursoObligatorio)
 admin.site.register(CursoOptativo)
+admin.site.register(CursoCurricular)
+admin.site.register(CursoObligatorioEje)
+admin.site.register(CursoOptativoEje)
+admin.site.register(CursoCurricularEje)
 admin.site.register(ActualizacionDisciplinarCedula)
 admin.site.register(FormacionAcademicaCedula)
 admin.site.register(CapacitacionDocenteCedula)

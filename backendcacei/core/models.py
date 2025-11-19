@@ -43,10 +43,12 @@ class ProgramaEducativo(models.Model):
 class Curso(models.Model):
     OBLIGATORIO = 'obligatorio'
     OPTATIVO = 'optativo'
+    CURRICULAR = 'curricular'
 
     TIPO_CHOICES = [
         (OBLIGATORIO, 'Obligatorio'),
         (OPTATIVO, 'Optativo'),
+        (CURRICULAR, 'Curricular'),
     ]
     
     programa = models.ForeignKey(ProgramaEducativo, on_delete=models.PROTECT)

@@ -1,5 +1,7 @@
 from django.db import models
 
+from core.models import Curso
+
 # Create your models here.
 class Cedula(models.Model):
     ORGANIZACION_CURRICULAR = 'organizacion_curricular'
@@ -36,22 +38,63 @@ class Cedula(models.Model):
         super().save(*args, **kwargs)
         
         if self.tipo == Cedula.ORGANIZACION_CURRICULAR and self.programa:
-            cursos = self.programa.curso_set.all()
+            cursos = Curso.objects.filter(
+                programa=self.programa,
+                profesorcurso__periodo=self.periodo
+            ).distinct()
             
             obligatorios = cursos.filter(tipo='obligatorio')
             optativos = cursos.filter(tipo='optativo')
+            curriculares = cursos.filter(tipo="curricular")
             
             # Eliminar relaciones previas si estás actualizando
+            CursoObligatorioEje.objects.filter(curso_obligatorio__cedula=self).delete()
+            CursoOptativoEje.objects.filter(curso_optativo__cedula=self).delete()
+            CursoCurricularEje.objects.filter(curso_curricular__cedula=self).delete()
+            
             CursoObligatorio.objects.filter(cedula=self).delete()
             CursoOptativo.objects.filter(cedula=self).delete()
+            CursoCurricular.objects.filter(cedula=self).delete()
             
-            # Crear nuevas relaciones
-            CursoObligatorio.objects.bulk_create([
-                CursoObligatorio(cedula=self, curso=curso) for curso in obligatorios
-            ])
-            CursoOptativo.objects.bulk_create([
-                CursoOptativo(cedula=self, curso=curso) for curso in optativos
-            ])
+            # Crear nuevas relaciones 
+            for curso in obligatorios:
+                co = CursoObligatorio.objects.create(
+                    cedula=self,
+                    curso=curso,
+                )
+                for relacion in curso.cursoeje_set.all():
+                    CursoObligatorioEje.objects.create(
+                        curso_obligatorio=co,
+                        eje=relacion.eje,
+                        nombre_eje=relacion.eje.nombre,
+                        horas=relacion.horas,
+                    )
+            
+            for curso in optativos:
+                co = CursoOptativo.objects.create(
+                    cedula=self,
+                    curso=curso,
+                )
+                for relacion in curso.cursoeje_set.all():
+                    CursoOptativoEje.objects.create(
+                        curso_optativo=co,
+                        eje=relacion.eje,
+                        nombre_eje=relacion.eje.nombre,
+                        horas=relacion.horas,
+                    )
+            
+            for curso in curriculares:
+                cc = CursoCurricular.objects.create(
+                    cedula=self,
+                    curso=curso,
+                )
+                for relacion in curso.cursoeje.all():
+                    CursoCurricularEje.objects.create(
+                        curso_curricular=cc,
+                        eje=relacion.eje,
+                        nombre_eje=relacion.eje.nombre,
+                        horas=relacion.horas
+                    )
         
         if self.tipo == Cedula.CV_SINTETICO and self.profesor:
             ActualizacionDisciplinarCedula.objects.filter(cedula=self).delete()
@@ -313,6 +356,34 @@ class CursoOptativo(models.Model):
     
     def __str__(self):
         return f"{self.curso.nombre} (Optativo)"
+
+class CursoCurricular(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.curso.nombre} (Curricular)"
+
+class CursoObligatorioEje(models.Model):
+    curso_obligatorio = models.ForeignKey(CursoObligatorio, on_delete=models.PROTECT)
+    eje = models.ForeignKey("gestion_academica.EjeConocimiento", on_delete=models.PROTECT)
+    nombre_eje = models.CharField(max_length=50)
+    horas = models.PositiveIntegerField()
+
+class CursoOptativoEje(models.Model):
+    curso_optativo = models.ForeignKey(CursoOptativo, on_delete=models.PROTECT)
+    eje = models.ForeignKey("gestion_academica.EjeConocimiento", on_delete=models.PROTECT)
+    nombre_eje = models.CharField(max_length=50)
+    horas = models.PositiveIntegerField()
+
+class CursoCurricularEje(models.Model):
+    curso_curricular = models.ForeignKey(CursoCurricular, on_delete=models.PROTECT)
+    eje = models.ForeignKey("gestion_academica.EjeConocimiento", on_delete=models.PROTECT)
+    nombre_eje = models.CharField(max_length=50)
+    horas = models.PositiveIntegerField()
 
 # CV SINTETICO MODELS
 

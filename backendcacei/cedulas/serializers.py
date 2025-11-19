@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
+from django.db.models import Sum
+
 from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, ObjetivoEducacionalSerializer
-from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoAtributoPECedula, CursoCedula, CursoObligatorio, CursoOptativo, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
+from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoAtributoPECedula, CursoCedula, CursoCurricular, CursoCurricularEje, CursoObligatorio, CursoObligatorioEje, CursoOptativo, CursoOptativoEje, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
 from core.models import Periodo, Profesor, ProgramaEducativo
 
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer
@@ -20,6 +22,10 @@ class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
 
     cursos_obligatorios = serializers.SerializerMethodField()
     cursos_optativos = serializers.SerializerMethodField()
+    cursos_curriculares = serializers.SerializerMethodField()
+    resumen_horas_cursos_obligatorios = serializers.SerializerMethodField()
+    resumen_horas_cursos_optativos = serializers.SerializerMethodField()
+    resumen_combinado = serializers.SerializerMethodField()
 
     class Meta:
         model = Cedula
@@ -27,6 +33,10 @@ class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
             "id", "programa", "programa_id", "periodo", "periodo_id", "tipo",
             "cursos_obligatorios",
             "cursos_optativos",
+            "cursos_curriculares",
+            "resumen_horas_cursos_obligatorios",
+            "resumen_horas_cursos_optativos",
+            "resumen_combinado"
         ]
         read_only_fields = ["id"]
     
@@ -37,20 +47,112 @@ class CedulaOrganizacionCurricularSerializer(serializers.ModelSerializer):
     def get_cursos_optativos(self, obj):
         relaciones = CursoOptativo.objects.filter(cedula=obj)
         return CursoOptativoSerializer(relaciones, many=True).data
+    
+    def get_cursos_curriculares(self, obj):
+        relaciones = CursoCurricular.objects.filter(cedula=obj)
+        return CursoCurricularSerializer(relaciones, many=True).data
+
+    def get_resumen_horas_cursos_obligatorios(self, obj):
+        resumen = CursoObligatorioEje.objects.filter(
+            curso_obligatorio__cedula=obj
+        ).values('nombre_eje').annotate(total_horas=Sum('horas'))
+        
+        total = sum(r['total_horas'] for r in resumen)
+        
+        return {
+            "por_eje": resumen,
+            "total_general": total
+        }
+
+    def get_resumen_horas_cursos_optativos(self, obj):
+        resumen = CursoOptativoEje.objects.filter(
+            curso_optativo__cedula=obj
+        ).values('nombre_eje').annotate(total_horas=Sum('horas'))
+        
+        total = sum(r['total_horas'] for r in resumen)
+        
+        return {
+            "por_eje": resumen,
+            "total_general": total
+        }
+
+    def get_resumen_combinado(self, obj):
+        from collections import defaultdict
+        
+        # Obtener ejes obligatorios
+        obligatorios = CursoObligatorioEje.objects.filter(
+            curso_obligatorio__cedula=obj
+        ).values('nombre_eje').annotate(total_horas=Sum('horas'))
+        
+        # Obtener ejes optativos
+        optativos = CursoOptativoEje.objects.filter(
+            curso_optativo__cedula=obj
+        ).values('nombre_eje').annotate(total_horas=Sum('horas'))
+        
+        # Combinar por nombre_eje
+        resumen = defaultdict(int)
+        for r in obligatorios:
+            resumen[r['nombre_eje']] += r['total_horas']
+        for r in optativos:
+            resumen[r['nombre_eje']] += r['total_horas']
+        
+        total_general = sum(resumen.values())
+        
+        por_eje = []
+        for nombre_eje, total_horas in resumen.items():
+            porcentaje = (total_horas / total_general * 100) if total_general > 0 else 0
+            por_eje.append({
+                'nombre_eje': nombre_eje,
+                'total_horas': total_horas,
+                'porcentaje': "{:.2f}".format(porcentaje)
+            })
+        
+        return {
+            "por_eje": por_eje,
+            "total_general": total_general
+        }
+
+class CursoObligatorioEjeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CursoObligatorioEje
+        fields = ["id", "nombre_eje", "horas"]
+
+class CursoOptativoEjeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CursoOptativoEje
+        fields = ["id", "nombre_eje", "horas"]
+
+class CursoCurricularEjeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CursoCurricularEje
+        fields = ["id", "nombre_eje", "horas"]
 
 class CursoOptativoSerializer(serializers.ModelSerializer):
-    curso = CursoSerializer(read_only=True)
-
+    curso_clave = serializers.CharField(source='curso.clave', read_only=True)
+    curso_nombre = serializers.CharField(source='curso.nombre', read_only=True)
+    ejes = CursoOptativoEjeSerializer(many=True, read_only=True, source='cursooptativoeje_set')
+    
     class Meta:
         model = CursoOptativo
-        fields = ["id", "curso"]
+        fields = ["id", "curso_clave", "curso_nombre", "ejes"]
 
 class CursoObligatorioSerializer(serializers.ModelSerializer):
-    curso = CursoSerializer(read_only=True)
+    curso_clave = serializers.CharField(source='curso.clave', read_only=True)
+    curso_nombre = serializers.CharField(source='curso.nombre', read_only=True)
+    ejes = CursoObligatorioEjeSerializer(many=True, read_only=True, source='cursoobligatorioeje_set')
     
     class Meta:
         model = CursoObligatorio
-        fields = ["id", "curso"]
+        fields = ["id", "curso_clave", "curso_nombre", "ejes"]
+
+class CursoCurricularSerializer(serializers.ModelSerializer):
+    curso_clave = serializers.CharField(source='curso.clave', read_only=True)
+    curso_nombre = serializers.CharField(source='curso.nombre', read_only=True)
+    ejes = CursoCurricularEjeSerializer(many=True, read_only=True, source='cursocurriculareje_set')
+    
+    class Meta:
+        model = CursoCurricular
+        fields = ["id", "curso_clave", "curso_nombre", "ejes"]
 
 class CedulaCvSinteticoSerializer(serializers.ModelSerializer):
     profesor = ProfesorSerializer(read_only=True)
