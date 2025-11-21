@@ -99,7 +99,7 @@ class Bibliografia(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.numero}. {self.autor} - {self.titulo} ({self.anio_publicacion})"
+        return f"{self.autor}. ({self.anio_publicacion}). {self.titulo}. {self.editorial}."
 
 class HorasSemana(models.Model):
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
@@ -108,10 +108,6 @@ class HorasSemana(models.Model):
     horas_aula = models.PositiveSmallIntegerField()
     horas_laboratorio = models.PositiveSmallIntegerField()
     horas_practicas = models.PositiveSmallIntegerField()
-    numero_grupos = models.PositiveSmallIntegerField()
-    calificacion_promedio = models.DecimalField(max_digits=3, decimal_places=1)
-    porcentaje_aprobacion = models.DecimalField(max_digits=5, decimal_places=2)
-    porcentaje_reprobacion = models.DecimalField(max_digits=5, decimal_places=2)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

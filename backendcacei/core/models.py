@@ -60,7 +60,7 @@ class Curso(models.Model):
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=OBLIGATORIO)
     horas_totales = models.IntegerField()
     objetivo_general = models.TextField(blank=True, null=True)
-
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

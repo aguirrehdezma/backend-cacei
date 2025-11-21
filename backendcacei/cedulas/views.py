@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 
-from cedulas.serializers import CedulaAEPVsAECACEISerializer, CedulaAEPVsOESerializer, CedulaCursosVsAEPSerializer, CedulaCvSinteticoSerializer, CedulaHerramientasValoracionAEPSerializer, CedulaOrganizacionCurricularSerializer, CedulaPlanMejoraSerializer, CedulaValoracionObjetivosSerializer
+from cedulas.serializers import CedulaAEPVsAECACEISerializer, CedulaAEPVsOESerializer, CedulaCursosVsAEPSerializer, CedulaCvSinteticoSerializer, CedulaHerramientasValoracionAEPSerializer, CedulaOrganizacionCurricularSerializer, CedulaPlanMejoraSerializer, CedulaProgramaAsignaturaSerializer, CedulaValoracionObjetivosSerializer
 from cedulas.models import Cedula
 
 class CedulaViewSet(viewsets.ModelViewSet):
@@ -31,6 +31,8 @@ class CedulaViewSet(viewsets.ModelViewSet):
                 return CedulaCursosVsAEPSerializer
             elif cedula.tipo == Cedula.HERRAMIENTAS_VALORACION_AEP:
                 return CedulaHerramientasValoracionAEPSerializer
+            elif cedula.tipo == Cedula.PROGRAMA_ASIGNATURA:
+                return CedulaProgramaAsignaturaSerializer
             return CedulaOrganizacionCurricularSerializer
         
         # Para create/list, usa el tipo desde request
@@ -49,6 +51,8 @@ class CedulaViewSet(viewsets.ModelViewSet):
             return CedulaCursosVsAEPSerializer
         elif tipo == Cedula.HERRAMIENTAS_VALORACION_AEP:
             return CedulaHerramientasValoracionAEPSerializer
+        elif tipo == Cedula.PROGRAMA_ASIGNATURA:
+            return CedulaProgramaAsignaturaSerializer
         return CedulaOrganizacionCurricularSerializer
     
     def get_serializer_context(self):

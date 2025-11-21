@@ -20,7 +20,7 @@ class ProfesorCurso(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.curso.clave} {self.curso.nombre} - {self.profesor.nombres} {self.profesor.apellidos} ({self.periodo.nombre})"
+        return f"{self.curso.clave} {self.curso.nombre} - {str(self.profesor)} ({self.periodo.nombre})"
 
 class FormacionAcademica(models.Model):
     LICENCIATURA = 'licenciatura'
@@ -39,16 +39,16 @@ class FormacionAcademica(models.Model):
     institucion = models.ForeignKey('core.Institucion', on_delete=models.PROTECT)
     
     nivel = models.CharField(max_length=20, choices=NIVEL_CHOICES, default=LICENCIATURA)
+    nombre = models.CharField(max_length=100)
     pais = models.CharField(max_length=50)
     anio_obtencion = models.PositiveSmallIntegerField()
-    cedula_profesional= models.CharField(max_length=50, blank=True, null=True)
-    especialidad= models.CharField(max_length=100, blank=True, null=True)
+    cedula_profesional = models.CharField(max_length=50, blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} tiene formacion academica de {self.nivel}"
+        return f"{str(self.profesor)} tiene formacion academica de {self.nivel}"
 
 class ExperienciaProfesional(models.Model):
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
@@ -63,7 +63,7 @@ class ExperienciaProfesional(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} trabajó en {self.organizacion.nombre} como {self.puesto}"
+        return f"{str(self.profesor)} trabajó en {self.organizacion.nombre} como {self.puesto}"
     
 class ExperienciaDiseno(models.Model):
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
@@ -77,7 +77,7 @@ class ExperienciaDiseno(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} tiene experiencia de diseño de {self.nivel_experiencia} en {self.organizacion.nombre}"
+        return f"{str(self.profesor)} tiene experiencia de diseño de {self.nivel_experiencia} en {self.organizacion.nombre}"
 
 class LogroProfesional(models.Model):
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
@@ -90,7 +90,7 @@ class LogroProfesional(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} tiene logros de {self.descripcion} en {self.anio}"
+        return f"{str(self.profesor)} tiene logros de {self.descripcion} en {self.anio}"
 
 class PremioDistincion(models.Model):
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
@@ -103,7 +103,7 @@ class PremioDistincion(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} recibió el premio {self.descripcion} en {self.anio}"
+        return f"{str(self.profesor)} recibió el premio {self.descripcion} en {self.anio}"
 
 class ParticipacionOrganizaciones(models.Model):
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
@@ -116,7 +116,7 @@ class ParticipacionOrganizaciones(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} participó en {self.organizacion.nombre}"
+        return f"{str(self.profesor)} participó en {self.organizacion.nombre}"
 
 class CapacitacionDocente(models.Model):
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
@@ -131,7 +131,7 @@ class CapacitacionDocente(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} recibió esta capacitación docente {self.nombre_curso}"
+        return f"{str(self.profesor)} recibió esta capacitación docente {self.nombre_curso}"
 
 class ActualizacionDisciplinar(models.Model):
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
@@ -146,7 +146,7 @@ class ActualizacionDisciplinar(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Profesor {self.profesor.nombres} {self.profesor.apellidos} recibió esta actualización disciplinar {self.nombre_curso}"
+        return f"{str(self.profesor)} recibió esta actualización disciplinar {self.nombre_curso}"
 
 class ProductoAcademico(models.Model):
     PUBLICACION = 'publicacion'

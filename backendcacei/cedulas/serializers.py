@@ -3,8 +3,8 @@ from rest_framework import serializers
 from django.db.models import Sum
 
 from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, ObjetivoEducacionalSerializer
-from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoAtributoPECedula, CursoCedula, CursoCurricular, CursoCurricularEje, CursoObligatorio, CursoObligatorioEje, CursoOptativo, CursoOptativoEje, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PremioDistincionCedula, ProductoAcademicoCedula
-from core.models import Periodo, Profesor, ProgramaEducativo
+from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, BibliografiaCedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoAtributoPECedula, CursoCedula, CursoCurricular, CursoCurricularEje, CursoEjeCedula, CursoEstadisticasCedula, CursoInfoCedula, CursoObjetivoEspecificoCedula, CursoObligatorio, CursoObligatorioEje, CursoOptativo, CursoOptativoEje, EstrategiaEnsenanzaCedula, EstrategiaEvaluacionCedula, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, HorasSemanaCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PracticaCedula, PremioDistincionCedula, ProductoAcademicoCedula, ProfesorActualCedula, ProfesorAnteriorCedula, UnidadTematicaCedula
+from core.models import Curso, Periodo, Profesor, ProgramaEducativo
 
 from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer
 from core.serializers import CursoSerializer, PeriodoSerializer, ProgramaEducativoSerializer, ProfesorSerializer
@@ -548,7 +548,7 @@ class CursoAtributoPECedulaSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CursoAtributoPECedula
-        fields = ["id", "curso", "atributo_pe", "relacion"]
+        fields = ["id", "curso", "atributo_pe", "relacion", "nombre_abreviado", "nivel_aporte"]
 
 class AtributoPECedulaHerramientasSerializer(serializers.ModelSerializer):
     atributo_pe = AtributoPESerializer(read_only=True)
@@ -582,3 +582,159 @@ class CedulaHerramientasValoracionAEPSerializer(serializers.ModelSerializer):
     def get_atributos_pe(self, obj):
         relaciones = AtributoPECedula.objects.filter(cedula=obj)
         return AtributoPECedulaHerramientasSerializer(relaciones, many=True).data
+
+class CedulaProgramaAsignaturaSerializer(serializers.ModelSerializer):
+    programa = ProgramaEducativoSerializer(read_only=True)
+    periodo = PeriodoSerializer(read_only=True)
+    curso = CursoSerializer(read_only=True)
+    programa_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProgramaEducativo.objects.all(), source='programa', write_only=True
+    )
+    periodo_id = serializers.PrimaryKeyRelatedField(
+        queryset=Periodo.objects.all(), source='periodo', write_only=True
+    )
+    curso_id = serializers.PrimaryKeyRelatedField(
+        queryset=Curso.objects.all(), source='curso', write_only=True
+    )
+    
+    curso_info = serializers.SerializerMethodField()
+    ejes = serializers.SerializerMethodField()
+    objetivos = serializers.SerializerMethodField()
+    atributos_pe = serializers.SerializerMethodField()
+    horas_semana = serializers.SerializerMethodField()
+    estadisticas = serializers.SerializerMethodField()
+    unidades_tematicas = serializers.SerializerMethodField()
+    estrategias_ensenanza = serializers.SerializerMethodField()
+    estrategias_evaluacion = serializers.SerializerMethodField()
+    practicas = serializers.SerializerMethodField()
+    bibliografia = serializers.SerializerMethodField()
+    profesores_actuales = serializers.SerializerMethodField()
+    profesores_anteriores = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Cedula
+        fields = [
+            "id", "tipo", "programa", "programa_id", "periodo", "periodo_id", "curso", "curso_id",
+            "curso_info", "ejes", "objetivos", "atributos_pe", "horas_semana", 
+            "estadisticas", "unidades_tematicas", "estrategias_ensenanza", 
+            "estrategias_evaluacion", "practicas", "bibliografia",
+            "profesores_actuales", "profesores_anteriores"
+        ]
+    
+    def get_curso_info(self, obj):
+        relaciones = CursoInfoCedula.objects.filter(cedula=obj)
+        return CursoInfoCedulaSerializer(relaciones, many=True).data
+    
+    def get_ejes(self, obj):
+        relaciones = CursoEjeCedula.objects.filter(cedula=obj)
+        return CursoEjeCedulaSerializer(relaciones, many=True).data
+    
+    def get_objetivos(self, obj):
+        relaciones = CursoObjetivoEspecificoCedula.objects.filter(cedula=obj)
+        return CursoObjetivoEspecificoCedulaSerializer(relaciones, many=True).data
+    
+    def get_atributos_pe(self, obj):
+        relaciones = CursoAtributoPECedula.objects.filter(cedula=obj)
+        return CursoAtributoPECedulaSerializer(relaciones, many=True).data
+    
+    def get_horas_semana(self, obj):
+        relaciones = HorasSemanaCedula.objects.filter(cedula=obj)
+        return HorasSemanaCedulaSerializer(relaciones, many=True).data
+    
+    def get_estadisticas(self, obj):
+        relaciones = CursoEstadisticasCedula.objects.filter(cedula=obj)
+        return CursoEstadisticasCedulaSerializer(relaciones, many=True).data
+    
+    def get_unidades_tematicas(self, obj):
+        relaciones = UnidadTematicaCedula.objects.filter(cedula=obj)
+        return UnidadTematicaCedulaSerializer(relaciones, many=True).data
+    
+    def get_estrategias_ensenanza(self, obj):
+        relaciones = EstrategiaEnsenanzaCedula.objects.filter(cedula=obj)
+        return EstrategiaEnsenanzaCedulaSerializer(relaciones, many=True).data
+    
+    def get_estrategias_evaluacion(self, obj):
+        relaciones = EstrategiaEvaluacionCedula.objects.filter(cedula=obj)
+        return EstrategiaEvaluacionCedulaSerializer(relaciones, many=True).data
+    
+    def get_practicas(self, obj):
+        relaciones = PracticaCedula.objects.filter(cedula=obj)
+        return PracticaCedulaSerializer(relaciones, many=True).data
+    
+    def get_bibliografia(self, obj):
+        relaciones = BibliografiaCedula.objects.filter(cedula=obj)
+        return BibliografiaCedulaSerializer(relaciones, many=True).data
+    
+    def get_profesores_actuales(self, obj):
+        relaciones = ProfesorActualCedula.objects.filter(cedula=obj)
+        return ProfesorActualCedulaSerializer(relaciones, many=True).data
+    
+    def get_profesores_anteriores(self, obj):
+        relaciones = ProfesorAnteriorCedula.objects.filter(cedula=obj)
+        return ProfesorAnteriorCedulaSerializer(relaciones, many=True).data
+
+class CursoInfoCedulaSerializer(serializers.ModelSerializer):
+    curso = CursoSerializer(read_only=True)
+    
+    class Meta:
+        model = CursoInfoCedula
+        fields = ["id", "clave", "nombre", "seriacion", "ubicacion", "tipo", "objetivo_general", "numero_grupos"]
+
+class CursoEjeCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CursoEjeCedula
+        fields = ["id", "nombre_eje", "horas"]
+
+class CursoObjetivoEspecificoCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CursoObjetivoEspecificoCedula
+        fields = ["id", "descripcion"]
+
+class HorasSemanaCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HorasSemanaCedula
+        fields = ["id", "horas_totales", "horas_aula", "horas_laboratorio", "horas_practicas"]
+
+class CursoEstadisticasCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CursoEstadisticasCedula
+        fields = ["id", "promedio", "porcentaje_mayores_iguales", "porcentaje_reprobados"]
+
+class UnidadTematicaCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UnidadTematicaCedula
+        fields = ["id", "descripcion"]
+
+class EstrategiaEnsenanzaCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EstrategiaEnsenanzaCedula
+        fields = ["id", "descripcion"]
+
+class EstrategiaEvaluacionCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EstrategiaEvaluacionCedula
+        fields = ["id", "descripcion"]
+
+class PracticaCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PracticaCedula
+        fields = ["id", "descripcion"]
+
+class BibliografiaCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BibliografiaCedula
+        fields = ["id", "referencia"]
+
+class ProfesorActualCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfesorActualCedula
+        fields = [
+            "id", "nombres", "apellidos", "formacion_nombre", "experiencia_profesional",
+        ]
+
+class ProfesorAnteriorCedulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfesorAnteriorCedula
+        fields = [
+            "id", "nombres", "apellidos", "formacion_nombre", "experiencia_profesional",
+        ]

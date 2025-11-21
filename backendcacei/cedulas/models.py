@@ -1,5 +1,8 @@
 from django.db import models
+from django.db.models import Avg
 
+from gestion_academica.models import Calificacion
+from gestion_de_profesores.models import ProfesorCurso
 from core.models import Curso
 
 # Create your models here.
@@ -12,6 +15,7 @@ class Cedula(models.Model):
     AEP_VS_OE = 'aep_vs_oe'
     CURSOS_VS_AEP = 'cursos_vs_aep'
     HERRAMIENTAS_VALORACION_AEP = 'herramientas_valoracion_aep'
+    PROGRAMA_ASIGNATURA = 'programa_asignatura'
     
     TIPO_CHOICES = [
         (ORGANIZACION_CURRICULAR, 'Organización Curricular'),
@@ -22,6 +26,7 @@ class Cedula(models.Model):
         (AEP_VS_OE, 'AEP vs OE'),
         (CURSOS_VS_AEP, 'Cursos vs AEP'),
         (HERRAMIENTAS_VALORACION_AEP, 'Herramientas de Valoración de AEP'),
+        (PROGRAMA_ASIGNATURA, 'Programa de Asignatura'),
     ]
     
     programa = models.ForeignKey('core.ProgramaEducativo', on_delete=models.PROTECT, null=True, blank=True)
@@ -278,7 +283,9 @@ class Cedula(models.Model):
                             cedula=self,
                             curso=c,
                             atributo_pe=rel.atributo_pe,
-                            relacion=rel
+                            relacion=rel,
+                            nombre_abreviado=rel.atributo_pe.nombre_abreviado,
+                            nivel_aporte=rel.nivel_aporte
                         )
                     )
             CursoAtributoPECedula.objects.bulk_create(relaciones)
@@ -331,7 +338,199 @@ class Cedula(models.Model):
             CriterioDesempenoCedula.objects.bulk_create(criterios)
             IndicadorCedula.objects.bulk_create(indicadores)
             EvaluacionIndicadorCedula.objects.bulk_create(evaluaciones)
-    
+        
+        if self.tipo == Cedula.PROGRAMA_ASIGNATURA and self.programa and self.curso:            
+            # Limpiar snapshots previos
+            CursoInfoCedula.objects.filter(cedula=self).delete()
+            CursoEjeCedula.objects.filter(cedula=self).delete()
+            CursoObjetivoEspecificoCedula.objects.filter(cedula=self).delete()
+            CursoAtributoPECedula.objects.filter(cedula=self).delete()
+            HorasSemanaCedula.objects.filter(cedula=self).delete()
+            CursoEstadisticasCedula.objects.filter(cedula=self).delete()
+            UnidadTematicaCedula.objects.filter(cedula=self).delete()
+            EstrategiaEnsenanzaCedula.objects.filter(cedula=self).delete()
+            EstrategiaEvaluacionCedula.objects.filter(cedula=self).delete()
+            PracticaCedula.objects.filter(cedula=self).delete()
+            BibliografiaCedula.objects.filter(cedula=self).delete()
+            ProfesorActualCedula.objects.filter(cedula=self).delete()
+            ProfesorAnteriorCedula.objects.filter(cedula=self).delete()
+            
+            # Contar grupos (ProfesorCurso = cada grupo impartido en ese periodo)
+            numero_grupos = ProfesorCurso.objects.filter(
+                curso=self.curso,
+                periodo=self.periodo
+            ).count()
+            
+            # Congelar info básica del curso
+            CursoInfoCedula.objects.create(
+                cedula=self,
+                clave=self.curso.clave,
+                nombre=self.curso.nombre,
+                seriacion=self.curso.seriacion,
+                ubicacion=self.curso.ubicacion,
+                tipo=self.curso.tipo,
+                objetivo_general=self.curso.objetivo_general,
+                numero_grupos=numero_grupos
+            )
+            
+            # Congelar ejes del curso
+            for relacion in self.curso.cursoeje_set.all():
+                CursoEjeCedula.objects.create(
+                    cedula=self,
+                    eje=relacion.eje,
+                    nombre_eje=relacion.eje.nombre,
+                    horas=relacion.horas
+                )
+            
+            # Congelar objetivos específicos
+            for relacion in self.curso.objetivoespecifico_set.all():
+                CursoObjetivoEspecificoCedula.objects.create(
+                    cedula=self,
+                    objetivo=relacion.objetivo,
+                    descripcion=relacion.objetivo.descripcion
+                )
+            
+            # Congelar relaciones atributos PE del curso
+            for relacion in self.curso.cursoatributope_set.all():
+                CursoAtributoPECedula.objects.create(
+                    cedula=self,
+                    curso=self.curso,
+                    atributo_pe=relacion.atributo_pe,
+                    relacion=relacion,
+                    nombre_abreviado=relacion.atributo_pe.nombre_abreviado,
+                    nivel_aporte=relacion.nivel_aporte
+                )
+            
+            # Congelar horas por semana del curso
+            for hs in self.curso.horasemana_set.all():
+                HorasSemanaCedula.objects.create(
+                    cedula=self,
+                    horas_totales=hs.horas_totales,
+                    horas_aula=hs.horas_aula,
+                    horas_laboratorio=hs.horas_laboratorio,
+                    horas_practicas=hs.horas_practicas
+                )
+            
+            # Obtener todas las calificaciones de este curso en el periodo
+            calificaciones = Calificacion.objects.filter(
+                profesor_curso__curso=self.curso,
+                profesor_curso__periodo=self.periodo
+            )
+            
+            total = calificaciones.count()
+            promedio = calificaciones.aggregate(prom=Avg('valor'))['prom'] or 0
+            
+            # % de calificaciones >= promedio
+            mayores_iguales = calificaciones.filter(valor__gte=promedio).count()
+            porcentaje_mayores_iguales = (mayores_iguales / total * 100) if total > 0 else 0
+            
+            # % de reprobados (< 70)
+            reprobados = calificaciones.filter(valor__lt=70).count()
+            porcentaje_reprobados = (reprobados / total * 100) if total > 0 else 0
+            
+            # Guardar snapshot de estadísticas
+            CursoEstadisticasCedula.objects.create(
+                cedula=self,
+                promedio=round(promedio, 2),
+                porcentaje_mayores_iguales=round(porcentaje_mayores_iguales, 2),
+                porcentaje_reprobados=round(porcentaje_reprobados, 2),
+            )
+            
+            # Congelar unidades temáticas
+            for ut in self.curso.unidadtematica_set.all():
+                UnidadTematicaCedula.objects.create(
+                    cedula=self,
+                    descripcion=ut.descripcion
+                )
+            
+            # Congelar estrategias de enseñanza
+            for ee in self.curso.estrategiaensenanza_set.all():
+                EstrategiaEnsenanzaCedula.objects.create(
+                    cedula=self,
+                    descripcion=ee.descripcion
+                )
+            
+            # Congelar estrategias de evaluación
+            for ev in self.curso.estrategiaevaluacion_set.all():
+                EstrategiaEvaluacionCedula.objects.create(
+                    cedula=self,
+                    descripcion=ev.descripcion
+                )
+            
+            # Congelar prácticas
+            for pr in self.curso.practica_set.all():
+                PracticaCedula.objects.create(
+                    cedula=self,
+                    descripcion=pr.descripcion
+                )
+            
+            # Congelar bibliografía
+            for b in self.curso.bibliografia_set.all():
+                BibliografiaCedula.objects.create(
+                    cedula=self,
+                    bibliografia=b,
+                    referencia=str(b) # usa el __str__ del modelo original
+                )
+            
+            # Congelar profesores actuales y de los últimos 2 años
+            
+            semestre_actual = self.periodo.semestre
+            anio_actual = self.periodo.anio
+            
+            periodos_validos = []
+            periodos_validos.append(self.periodo.nombre)  # periodo actual
+            for i in range(1, 5):
+                semestre_actual = "EM" if semestre_actual == "AD" else "AD"
+                periodos_validos.append(f"{semestre_actual}{anio_actual}")
+                if semestre_actual == "EM":
+                    anio_actual -= 1
+            
+            profesores_curso = ProfesorCurso.objects.filter(
+                curso=self.curso,
+                periodo__nombre__in=periodos_validos
+            )
+            
+            jerarquia = {
+                'licenciatura': 1,
+                'especialidad': 2,
+                'maestria': 3,
+                'doctorado': 4,
+            }
+            
+            for pc in profesores_curso:
+                profesor = pc.profesor
+                
+                # Buscar la formación más alta desde FormacionAcademica
+                formaciones = profesor.formacionacademica_set.all()
+                nombre_formacion = "No especificado"
+                if formaciones.exists():
+                    fm = max(formaciones, key=lambda f: jerarquia.get(f.nivel, 0))
+                    nombre_formacion = fm.nombre
+                
+                # Determinar si tiene experiencia profesional
+                experiencia = "Sí" if profesor.experienciaprofesional_set.exists() else "No"
+                
+                if pc.periodo_id == self.periodo_id:
+                    # Profesor del periodo actual
+                    ProfesorActualCedula.objects.create(
+                        cedula=self,
+                        profesor=profesor,
+                        nombres=profesor.nombres,
+                        apellidos=profesor.apellido_paterno + " " + profesor.apellido_materno,
+                        formacion_nombre=nombre_formacion,
+                        experiencia_profesional=experiencia,
+                    )
+                else:
+                    # Profesor de años anteriores
+                    ProfesorAnteriorCedula.objects.create(
+                        cedula=self,
+                        profesor=profesor,
+                        nombres=profesor.nombres,
+                        apellidos=profesor.apellido_paterno + " " + profesor.apellido_materno,
+                        formacion_nombre=nombre_formacion,
+                        experiencia_profesional=experiencia,
+                    )
+
     def __str__(self):
         return f"Cédula {self.tipo} - {self.id}"
 
@@ -565,6 +764,81 @@ class CursoAtributoPECedula(models.Model):
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
     atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
     relacion = models.ForeignKey('gestion_academica.CursoAtributoPE', on_delete=models.PROTECT)
-    
+    nombre_abreviado = models.CharField(max_length=50)
+    nivel_aporte = models.CharField(max_length=1)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+# PROGRAMA DE ASIGNATURA MODELS
+
+class CursoInfoCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    clave = models.CharField(max_length=20, unique=True)
+    nombre = models.CharField(max_length=100)
+    seriacion = models.TextField(blank=True, null=True)
+    ubicacion = models.CharField(max_length=50)
+    tipo = models.CharField(max_length=50)
+    objetivo_general = models.TextField(blank=True, null=True)
+    numero_grupos = models.PositiveSmallIntegerField()
+
+class CursoEjeCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    eje = models.ForeignKey('gestion_academica.EjeConocimiento', on_delete=models.PROTECT)
+    nombre_eje = models.CharField(max_length=50)
+    horas = models.PositiveIntegerField()
+
+class CursoObjetivoEspecificoCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    objetivo = models.ForeignKey('gestion_academica.ObjetivoEspecifico', on_delete=models.PROTECT)
+    descripcion = models.TextField(blank=True, null=True)
+
+class HorasSemanaCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    horas_totales = models.PositiveSmallIntegerField()
+    horas_aula = models.PositiveSmallIntegerField()
+    horas_laboratorio = models.PositiveSmallIntegerField()
+    horas_practicas = models.PositiveSmallIntegerField()
+
+class CursoEstadisticasCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    promedio = models.FloatField()
+    porcentaje_mayores_iguales = models.FloatField()
+    porcentaje_reprobados = models.FloatField()
+
+class UnidadTematicaCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    descripcion = models.TextField(blank=True, null=True)
+
+class EstrategiaEnsenanzaCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    descripcion = models.TextField(blank=True, null=True)
+
+class EstrategiaEvaluacionCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    descripcion = models.TextField(blank=True, null=True)
+
+class PracticaCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    descripcion = models.TextField(blank=True, null=True)
+
+class BibliografiaCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    bibliografia = models.ForeignKey('gestion_academica.Bibliografia', on_delete=models.PROTECT)
+    referencia = models.TextField()
+
+class ProfesorActualCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    nombres = models.CharField(max_length=100)
+    apellidos = models.CharField(max_length=100)
+    formacion_nombre = models.CharField(max_length=100)
+    experiencia_profesional = models.BooleanField(default=False)
+
+class ProfesorAnteriorCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
+    nombres = models.CharField(max_length=100)
+    apellidos = models.CharField(max_length=100)
+    formacion_nombre = models.CharField(max_length=100)
+    experiencia_profesional = models.CharField(max_length=2)
