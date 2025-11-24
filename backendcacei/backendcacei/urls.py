@@ -21,10 +21,13 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     
+    # Autenticación y usuarios
+    path('api/auth/', include('usuarios_y_acceso.urls')),
+    
+    # APIs de módulos
     path('api/core/', include('core.urls')),
     path('api/gestion_academica/', include('gestion_academica.urls')),
     path('api/evaluacion_acreditacion/', include('evaluacion_acreditacion.urls')),
     path('api/gestion_de_profesores/', include('gestion_de_profesores.urls')),
-    
     path('api/cedulas/', include('cedulas.urls')),
 ]

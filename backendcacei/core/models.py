@@ -1,7 +1,20 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 class Profesor(models.Model):
+    """
+    Modelo para representar a un Profesor.
+    Si el profesor tiene un usuario tipo 'docente', puede acceder al sistema.
+    """
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='profesor_profile',
+        help_text='Usuario asociado si el profesor tiene acceso al sistema como docente'
+    )
     numero_empleado = models.CharField(max_length=20, unique=True)
     apellido_paterno = models.CharField(max_length=50)
     apellido_materno = models.CharField(max_length=50)
@@ -13,9 +26,23 @@ class Profesor(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    
+    class Meta:
+        verbose_name = 'Profesor'
+        verbose_name_plural = 'Profesores'
+        ordering = ['apellido_paterno', 'apellido_materno', 'nombres']
+        
     def __str__(self):
         return f"{self.nombres} {self.apellido_paterno} {self.apellido_materno}"
+    
+    @property
+    def nombre_completo(self):
+        return f"{self.nombres} {self.apellido_paterno} {self.apellido_materno}"
+    
+    @property
+    def tiene_acceso_sistema(self):
+        # Retorna si el profesor tiene un usuario asociado
+        return self.user is not None
 
 class ProgramaEducativo(models.Model):
     ACTIVO = 'activo'
