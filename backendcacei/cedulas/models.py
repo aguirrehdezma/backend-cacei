@@ -539,32 +539,14 @@ class Cedula(models.Model):
 class CursoObligatorio(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return f"{self.curso.nombre} (Obligatorio)"
 
 class CursoOptativo(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return f"{self.curso.nombre} (Optativo)"
 
 class CursoCurricular(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return f"{self.curso.nombre} (Curricular)"
 
 class CursoObligatorioEje(models.Model):
     curso_obligatorio = models.ForeignKey(CursoObligatorio, on_delete=models.PROTECT)
@@ -589,155 +571,96 @@ class CursoCurricularEje(models.Model):
 class ActualizacionDisciplinarCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     actualizacion = models.ForeignKey('gestion_de_profesores.ActualizacionDisciplinar', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class FormacionAcademicaCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     formacion = models.ForeignKey('gestion_de_profesores.FormacionAcademica', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class CapacitacionDocenteCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     capacitacion = models.ForeignKey('gestion_de_profesores.CapacitacionDocente', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class ExperienciaProfesionalCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     experiencia = models.ForeignKey('gestion_de_profesores.ExperienciaProfesional', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class ExperienciaDisenoCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     experiencia = models.ForeignKey('gestion_de_profesores.ExperienciaDiseno', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class LogroProfesionalCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     logro = models.ForeignKey('gestion_de_profesores.LogroProfesional', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class ParticipacionOrganizacionesCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     participacion = models.ForeignKey('gestion_de_profesores.ParticipacionOrganizaciones', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class PremioDistincionCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     premio = models.ForeignKey('gestion_de_profesores.PremioDistincion', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class ProductoAcademicoCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     producto = models.ForeignKey('gestion_de_profesores.ProductoAcademico', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class AportacionPECedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     aportacion = models.ForeignKey('evaluacion_acreditacion.AportacionPE', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class GestionAcademicaCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     gestion = models.ForeignKey('evaluacion_acreditacion.GestionAcademica', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 # PLAN DE MEJORA MODELS
 
 class HallazgoCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     hallazgo = models.ForeignKey('evaluacion_acreditacion.Hallazgo', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class AccionMejoraCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     hallazgo = models.ForeignKey('evaluacion_acreditacion.Hallazgo', on_delete=models.PROTECT)
     accion = models.ForeignKey('evaluacion_acreditacion.AccionMejora', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 # VALORACION DE OBJETIVOS MODELS
 
 class ObjetivoEducacionalCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     objetivo = models.ForeignKey('gestion_academica.ObjetivoEducacional', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class AtributoObjetivoCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     objetivo = models.ForeignKey('gestion_academica.ObjetivoEducacional', on_delete=models.PROTECT)
     atributo = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class CriterioDesempenoCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     atributo = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
     criterio = models.ForeignKey('gestion_academica.CriterioDesempeno', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
 
 class IndicadorCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     criterio = models.ForeignKey('gestion_academica.CriterioDesempeno', on_delete=models.PROTECT)
     indicador = models.ForeignKey('evaluacion_acreditacion.Indicador', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class EvaluacionIndicadorCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     indicador = models.ForeignKey('evaluacion_acreditacion.Indicador', on_delete=models.PROTECT)
     evaluacion = models.ForeignKey('evaluacion_acreditacion.EvaluacionIndicador', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 # AEP vs AE-CACEI MODELS
 
 class AtributoPECedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class AtributoPECACEICedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
     atributo_cacei = models.ForeignKey('gestion_academica.AtributoCACEI', on_delete=models.PROTECT)
     relacion = models.ForeignKey('gestion_academica.AtributoPECACEI', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 # AEP vs OE MODELS
 
@@ -746,18 +669,12 @@ class AtributoObjetivoCedulaAEPVsOE(models.Model):
     objetivo = models.ForeignKey('gestion_academica.ObjetivoEducacional', on_delete=models.PROTECT)
     atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
     relacion = models.ForeignKey('gestion_academica.AtributoPEObjetivo', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 # CURSOS vs AEP MODELS
 
 class CursoCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class CursoAtributoPECedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
@@ -766,9 +683,6 @@ class CursoAtributoPECedula(models.Model):
     relacion = models.ForeignKey('gestion_academica.CursoAtributoPE', on_delete=models.PROTECT)
     nombre_abreviado = models.CharField(max_length=50)
     nivel_aporte = models.CharField(max_length=1)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 # PROGRAMA DE ASIGNATURA MODELS
 
