@@ -1,10 +1,14 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
+from usuarios_y_acceso.permissions import IsCoordinadorOrAdmin, ReadOnly
 from cedulas.serializers import CedulaAEPVsAECACEISerializer, CedulaAEPVsOESerializer, CedulaCursosVsAEPSerializer, CedulaCvSinteticoSerializer, CedulaHerramientasValoracionAEPSerializer, CedulaOrganizacionCurricularSerializer, CedulaPlanMejoraSerializer, CedulaProgramaAsignaturaSerializer, CedulaValoracionObjetivosSerializer
 from cedulas.models import Cedula
 
 class CedulaViewSet(viewsets.ModelViewSet):
     queryset = Cedula.objects.all()
+    # Admin/Coordinador pueden crear/editar, todos pueden leer
+    permission_classes = [IsAuthenticated, IsCoordinadorOrAdmin | ReadOnly]
     
     def get_queryset(self):
         queryset = super().get_queryset()
