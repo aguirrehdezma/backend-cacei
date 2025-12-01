@@ -387,8 +387,7 @@ class Cedula(models.Model):
             for relacion in self.curso.objetivoespecifico_set.all():
                 CursoObjetivoEspecificoCedula.objects.create(
                     cedula=self,
-                    objetivo=relacion.objetivo,
-                    descripcion=relacion.objetivo.descripcion
+                    descripcion=relacion.descripcion
                 )
             
             # Congelar relaciones atributos PE del curso
@@ -403,7 +402,7 @@ class Cedula(models.Model):
                 )
             
             # Congelar horas por semana del curso
-            for hs in self.curso.horasemana_set.all():
+            for hs in self.curso.horassemana_set.all():
                 HorasSemanaCedula.objects.create(
                     cedula=self,
                     horas_totales=hs.horas_totales,
@@ -498,6 +497,9 @@ class Cedula(models.Model):
                 'doctorado': 4,
             }
             
+            # Conjunto para evitar duplicados
+            profesores_actuales_ids = set()
+            
             for pc in profesores_curso:
                 profesor = pc.profesor
                 
@@ -511,7 +513,7 @@ class Cedula(models.Model):
                 # Determinar si tiene experiencia profesional
                 experiencia = "Sí" if profesor.experienciaprofesional_set.exists() else "No"
                 
-                if pc.periodo_id == self.periodo_id:
+                if pc.periodo == self.periodo:
                     # Profesor del periodo actual
                     ProfesorActualCedula.objects.create(
                         cedula=self,
@@ -521,16 +523,18 @@ class Cedula(models.Model):
                         formacion_nombre=nombre_formacion,
                         experiencia_profesional=experiencia,
                     )
+                    profesores_actuales_ids.add(profesor.id)
                 else:
                     # Profesor de años anteriores
-                    ProfesorAnteriorCedula.objects.create(
-                        cedula=self,
-                        profesor=profesor,
-                        nombres=profesor.nombres,
-                        apellidos=profesor.apellido_paterno + " " + profesor.apellido_materno,
-                        formacion_nombre=nombre_formacion,
-                        experiencia_profesional=experiencia,
-                    )
+                    if profesor.id not in profesores_actuales_ids:
+                        ProfesorAnteriorCedula.objects.create(
+                            cedula=self,
+                            profesor=profesor,
+                            nombres=profesor.nombres,
+                            apellidos=profesor.apellido_paterno + " " + profesor.apellido_materno,
+                            formacion_nombre=nombre_formacion,
+                            experiencia_profesional=experiencia,
+                        )
 
     def __str__(self):
         return f"Cédula {self.tipo} - {self.id}"
@@ -705,7 +709,6 @@ class CursoEjeCedula(models.Model):
 
 class CursoObjetivoEspecificoCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
-    objetivo = models.ForeignKey('gestion_academica.ObjetivoEspecifico', on_delete=models.PROTECT)
     descripcion = models.TextField(blank=True, null=True)
 
 class HorasSemanaCedula(models.Model):
@@ -748,7 +751,7 @@ class ProfesorActualCedula(models.Model):
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
     formacion_nombre = models.CharField(max_length=100)
-    experiencia_profesional = models.BooleanField(default=False)
+    experiencia_profesional = models.CharField(max_length=2)
 
 class ProfesorAnteriorCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)

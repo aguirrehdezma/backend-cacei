@@ -674,8 +674,6 @@ class CedulaProgramaAsignaturaSerializer(serializers.ModelSerializer):
         return ProfesorAnteriorCedulaSerializer(relaciones, many=True).data
 
 class CursoInfoCedulaSerializer(serializers.ModelSerializer):
-    curso = CursoSerializer(read_only=True)
-    
     class Meta:
         model = CursoInfoCedula
         fields = ["id", "clave", "nombre", "seriacion", "ubicacion", "tipo", "objetivo_general", "numero_grupos"]
