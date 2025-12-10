@@ -4,23 +4,24 @@ from django.db import models
 class ProfesorCurso(models.Model):
     RESPONSABLE = 'responsable'
     INSTRUCTOR = 'instructor'
-
+    
     TIPO_CHOICES = [
         (RESPONSABLE, 'Responsable'),
         (INSTRUCTOR, 'Instructor'),
     ]
-
+    
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT)
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
     periodo = models.ForeignKey('core.Periodo', on_delete=models.PROTECT)
     
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default=RESPONSABLE)
+    grupo_seccion = models.CharField(max_length=50)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.curso.clave} {self.curso.nombre} - {str(self.profesor)} ({self.periodo.nombre})"
+        return f"{self.curso.clave} {self.curso.nombre} Grupo {self.grupo_seccion}  - {str(self.profesor)} ({self.periodo.nombre})"
 
 class FormacionAcademica(models.Model):
     LICENCIATURA = 'licenciatura'

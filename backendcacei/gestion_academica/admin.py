@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from gestion_academica.models import Alumno, AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, Calificacion, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, Practica, UnidadTematica
+from gestion_academica.models import Actividad, Alumno, AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, Calificacion, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, Practica, UnidadTematica
 
 # Register your models here.
 admin.site.register(UnidadTematica)
@@ -21,3 +21,4 @@ admin.site.register(AtributoPECACEI)
 admin.site.register(Practica)
 admin.site.register(Alumno)
 admin.site.register(Calificacion)
+admin.site.register(Actividad)

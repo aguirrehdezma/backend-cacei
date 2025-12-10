@@ -11,7 +11,7 @@ class AccionMejoraSerializer(serializers.ModelSerializer):
 class EvaluacionIndicadorSerializer(serializers.ModelSerializer):
     class Meta:
         model = EvaluacionIndicador
-        fields = ['id', 'indicador', 'curso', 'grupo_seccion', 'instrumento_evaluacion', 'descripcion_instrumento', 'periodo_evaluacion', 'valoracion', 'analisis_resultados', 'meta']
+        fields = ['id', 'indicador', 'profesor_curso', 'instrumento_evaluacion', 'descripcion_instrumento', 'periodo_evaluacion', 'valoracion', 'analisis_resultados', 'meta']
         read_only_fields = ['id']
 
 class IndicadorSerializer(serializers.ModelSerializer):

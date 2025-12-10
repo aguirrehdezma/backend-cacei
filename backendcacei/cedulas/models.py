@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Avg
 
-from gestion_academica.models import Calificacion
+from gestion_academica.models import Actividad, Calificacion
 from gestion_de_profesores.models import ProfesorCurso
 from core.models import Curso
 
@@ -33,6 +33,7 @@ class Cedula(models.Model):
     periodo = models.ForeignKey('core.Periodo', on_delete=models.PROTECT)
     profesor = models.ForeignKey('core.Profesor', on_delete=models.PROTECT, null=True, blank=True)
     curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT, null=True, blank=True)
+    profesor_curso = models.ForeignKey('gestion_de_profesores.ProfesorCurso', on_delete=models.PROTECT, null=True, blank=True)
     
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=ORGANIZACION_CURRICULAR)
     
@@ -291,15 +292,22 @@ class Cedula(models.Model):
                     )
             CursoAtributoPECedula.objects.bulk_create(relaciones)
         
-        if self.tipo == Cedula.HERRAMIENTAS_VALORACION_AEP and self.programa:
+        if self.tipo == Cedula.HERRAMIENTAS_VALORACION_AEP and self.programa and self.profesor_curso:
             # Limpiar snapshots previos
             AtributoPECedula.objects.filter(cedula=self).delete()
             CriterioDesempenoCedula.objects.filter(cedula=self).delete()
             IndicadorCedula.objects.filter(cedula=self).delete()
             EvaluacionIndicadorCedula.objects.filter(cedula=self).delete()
+            CalificacionCedula.objects.filter(cedula=self).delete()
+            ActividadCedula.objects.filter(cedula=self).delete()
             
-            # Congelar atributos PE del programa
-            atributos_pe = self.programa.atributope_set.all()
+            # Obtener el curso desde ProfesorCurso
+            curso = self.profesor_curso.curso
+            
+            # Congelar solo los atributos PE relacionados con el curso
+            relaciones_curso = curso.cursoatributope_set.all()
+            atributos_pe = [rel.atributo_pe for rel in relaciones_curso]
+            
             AtributoPECedula.objects.bulk_create([
                 AtributoPECedula(cedula=self, atributo_pe=a) for a in atributos_pe
             ])
@@ -312,7 +320,7 @@ class Cedula(models.Model):
                     criterios.append(
                         CriterioDesempenoCedula(
                             cedula=self,
-                            atributo_pe=a,
+                            atributo=a,
                             criterio=c
                         )
                     )
@@ -326,12 +334,17 @@ class Cedula(models.Model):
                             )
                         )
                         # Desde indicador llego a evaluaciones
-                        for e in i.evaluacionindicador_set.all():
+                        # FILTRAR: solo evaluaciones del ProfesorCurso seleccionado
+                        for e in i.evaluacionindicador_set.filter(profesor_curso=self.profesor_curso):
                             evaluaciones.append(
                                 EvaluacionIndicadorCedula(
                                     cedula=self,
                                     indicador=i,
-                                    evaluacion=e
+                                    evaluacion=e,
+                                    clave_curso=self.profesor_curso.curso.clave,
+                                    nombre_curso=self.profesor_curso.curso.nombre,
+                                    grupo_seccion=self.profesor_curso.grupo_seccion,
+                                    responsable=self.profesor_curso.profesor.nombres + " " + self.profesor_curso.profesor.apellido_paterno + " " + self.profesor_curso.profesor.apellido_materno,
                                 )
                             )
             
@@ -339,6 +352,33 @@ class Cedula(models.Model):
             CriterioDesempenoCedula.objects.bulk_create(criterios)
             IndicadorCedula.objects.bulk_create(indicadores)
             EvaluacionIndicadorCedula.objects.bulk_create(evaluaciones)
+            
+            # Congelar calificaciones del ProfesorCurso
+            calificaciones = Calificacion.objects.filter(profesor_curso=self.profesor_curso)
+            CalificacionCedula.objects.bulk_create([
+                CalificacionCedula(
+                    cedula=self,
+                    calificacion=cal,
+                    clave_curso=self.profesor_curso.curso.clave,
+                    grupo_seccion=self.profesor_curso.grupo_seccion,
+                    matricula=cal.alumno.matricula,
+                    nombre_alumno=cal.alumno.nombre,
+                    apellido1_alumno=cal.alumno.apellido1,
+                    apellido2_alumno=cal.alumno.apellido2,
+                    valor_calificacion=cal.valor
+                ) for cal in calificaciones
+            ])
+            
+            actividades = Actividad.objects.filter(profesor_curso=self.profesor_curso)
+            ActividadCedula.objects.bulk_create([
+                ActividadCedula(
+                    cedula=self,
+                    actividad=act,
+                    atributo_pe=act.atributo_pe,
+                    nombre_actividad=act.nombre,
+                    descripcion_actividad=act.descripcion
+                ) for act in actividades
+            ])
         
         if self.tipo == Cedula.PROGRAMA_ASIGNATURA and self.programa and self.curso:            
             # Limpiar snapshots previos
@@ -654,6 +694,13 @@ class EvaluacionIndicadorCedula(models.Model):
     cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
     indicador = models.ForeignKey('evaluacion_acreditacion.Indicador', on_delete=models.PROTECT)
     evaluacion = models.ForeignKey('evaluacion_acreditacion.EvaluacionIndicador', on_delete=models.PROTECT)
+    responsable = models.CharField(max_length=130)
+    clave_curso = models.CharField(max_length=20)
+    nombre_curso = models.CharField(max_length=100)
+    grupo_seccion = models.CharField(max_length=50)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 # AEP vs AE-CACEI MODELS
 
@@ -760,3 +807,31 @@ class ProfesorAnteriorCedula(models.Model):
     apellidos = models.CharField(max_length=100)
     formacion_nombre = models.CharField(max_length=100)
     experiencia_profesional = models.CharField(max_length=2)
+
+# VALORACION DE HERRAMIENTAS AEP MODELS
+
+class CalificacionCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    calificacion = models.ForeignKey('gestion_academica.Calificacion', on_delete=models.PROTECT)
+    
+    # Datos del curso
+    clave_curso = models.CharField(max_length=20)
+    grupo_seccion = models.CharField(max_length=50)
+    
+    # Datos desnormalizados del alumno
+    matricula = models.CharField(max_length=50)
+    nombre_alumno = models.CharField(max_length=50)
+    apellido1_alumno = models.CharField(max_length=50)
+    apellido2_alumno = models.CharField(max_length=50, blank=True, null=True)
+    
+    # Calificación
+    valor_calificacion = models.PositiveSmallIntegerField()
+
+class ActividadCedula(models.Model):
+    cedula = models.ForeignKey(Cedula, on_delete=models.PROTECT)
+    actividad = models.ForeignKey('gestion_academica.Actividad', on_delete=models.PROTECT)
+    atributo_pe = models.ForeignKey('gestion_academica.AtributoPE', on_delete=models.PROTECT)
+    
+    # Datos desnormalizados
+    nombre_actividad = models.CharField(max_length=200)
+    descripcion_actividad = models.TextField()

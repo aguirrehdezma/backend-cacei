@@ -1,12 +1,13 @@
 from rest_framework import serializers
 
-from django.db.models import Sum
+from django.db.models import Avg, Sum
 
+from gestion_de_profesores.models import ProfesorCurso
 from gestion_academica.serializers import AtributoCACEISerializer, AtributoPECACEISerializer, AtributoPEObjetivoSerializer, AtributoPESerializer, CriterioDesempenoSerializer, CursoAtributoPESerializer, ObjetivoEducacionalSerializer
-from cedulas.models import AccionMejoraCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, BibliografiaCedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoAtributoPECedula, CursoCedula, CursoCurricular, CursoCurricularEje, CursoEjeCedula, CursoEstadisticasCedula, CursoInfoCedula, CursoObjetivoEspecificoCedula, CursoObligatorio, CursoObligatorioEje, CursoOptativo, CursoOptativoEje, EstrategiaEnsenanzaCedula, EstrategiaEvaluacionCedula, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, HorasSemanaCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PracticaCedula, PremioDistincionCedula, ProductoAcademicoCedula, ProfesorActualCedula, ProfesorAnteriorCedula, UnidadTematicaCedula
+from cedulas.models import AccionMejoraCedula, ActividadCedula, ActualizacionDisciplinarCedula, AportacionPECedula, AtributoObjetivoCedula, AtributoObjetivoCedulaAEPVsOE, AtributoPECACEICedula, AtributoPECedula, BibliografiaCedula, CalificacionCedula, CapacitacionDocenteCedula, Cedula, CriterioDesempenoCedula, CursoAtributoPECedula, CursoCedula, CursoCurricular, CursoCurricularEje, CursoEjeCedula, CursoEstadisticasCedula, CursoInfoCedula, CursoObjetivoEspecificoCedula, CursoObligatorio, CursoObligatorioEje, CursoOptativo, CursoOptativoEje, EstrategiaEnsenanzaCedula, EstrategiaEvaluacionCedula, EvaluacionIndicadorCedula, ExperienciaDisenoCedula, ExperienciaProfesionalCedula, FormacionAcademicaCedula, GestionAcademicaCedula, HallazgoCedula, HorasSemanaCedula, IndicadorCedula, LogroProfesionalCedula, ObjetivoEducacionalCedula, ParticipacionOrganizacionesCedula, PracticaCedula, PremioDistincionCedula, ProductoAcademicoCedula, ProfesorActualCedula, ProfesorAnteriorCedula, UnidadTematicaCedula
 from core.models import Curso, Periodo, Profesor, ProgramaEducativo
 
-from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer
+from gestion_de_profesores.serializers import ActualizacionDisciplinarSerializer, CapacitacionDocenteSerializer, ExperienciaDisenoSerializer, ExperienciaProfesionalSerializer, FormacionAcademicaSerializer, LogroProfesionalSerializer, ParticipacionOrganizacionesSerializer, PremioDistincionSerializer, ProductoAcademicoSerializer, ProfesorCursoSerializer
 from core.serializers import CursoSerializer, PeriodoSerializer, ProgramaEducativoSerializer, ProfesorSerializer
 from evaluacion_acreditacion.serializers import AccionMejoraSerializer, AportacionPESerializer, EvaluacionIndicadorSerializer, GestionAcademicaSerializer, HallazgoSerializer, IndicadorSerializer
 
@@ -366,17 +367,10 @@ class CedulaValoracionObjetivosSerializer(serializers.ModelSerializer):
 
 class EvaluacionIndicadorCedulaSerializer(serializers.ModelSerializer):
     evaluacion = EvaluacionIndicadorSerializer(read_only=True)
-    curso = serializers.SerializerMethodField()
     
     class Meta:
         model = EvaluacionIndicadorCedula
-        fields = ["id", "evaluacion", "curso"]
-    
-    def get_curso(self, obj):
-        if self.context.get("include_curso", False):
-            if obj.evaluacion and obj.evaluacion.curso:
-                return CursoSerializer(obj.evaluacion.curso).data
-        return None
+        fields = ["id", "evaluacion", "clave_curso", "nombre_curso", "grupo_seccion", "responsable"]
 
 class IndicadorCedulaSerializer(serializers.ModelSerializer):
     indicador = IndicadorSerializer(read_only=True)
@@ -553,35 +547,91 @@ class CursoAtributoPECedulaSerializer(serializers.ModelSerializer):
 class AtributoPECedulaHerramientasSerializer(serializers.ModelSerializer):
     atributo_pe = AtributoPESerializer(read_only=True)
     criterios = serializers.SerializerMethodField()
+    actividades = serializers.SerializerMethodField()
     
     class Meta:
         model = AtributoPECedula
-        fields = ["id", "atributo_pe", "criterios"]
+        fields = ["id", "atributo_pe", "criterios", "actividades"]
     
     def get_criterios(self, obj):
         relaciones = CriterioDesempenoCedula.objects.filter(
-            cedula=obj.cedula, atributo_pe=obj.atributo_pe
+            cedula=obj.cedula, atributo=obj.atributo_pe
         )
         return CriterioCedulaSerializer(relaciones, many=True, context=self.context).data
+    
+    def get_actividades(self, obj):
+        relaciones = ActividadCedula.objects.filter(
+            cedula=obj.cedula, atributo_pe=obj.atributo_pe
+        )
+        return ActividadCedulaSerializer(relaciones, many=True).data
 
 class CedulaHerramientasValoracionAEPSerializer(serializers.ModelSerializer):
     programa = ProgramaEducativoSerializer(read_only=True)
     periodo = PeriodoSerializer(read_only=True)
+    profesor_curso = ProfesorCursoSerializer(read_only=True)
     programa_id = serializers.PrimaryKeyRelatedField(
         queryset=ProgramaEducativo.objects.all(), source='programa', write_only=True
     )
     periodo_id = serializers.PrimaryKeyRelatedField(
         queryset=Periodo.objects.all(), source='periodo', write_only=True
     )
+    profesor_curso_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProfesorCurso.objects.all(), source='profesor_curso', write_only=True
+    )
+    
     atributos_pe = serializers.SerializerMethodField()
+    calificaciones = serializers.SerializerMethodField()
+    estadisticas = serializers.SerializerMethodField()
     
     class Meta:
         model = Cedula
-        fields = ["id", "tipo", "programa", "programa_id", "periodo", "periodo_id", "atributos_pe"]
+        fields = [
+            "id", "tipo", 
+            "programa", "programa_id", 
+            "periodo", "periodo_id", 
+            "profesor_curso", "profesor_curso_id",
+            "atributos_pe",
+            "calificaciones",
+            "estadisticas"
+        ]
     
     def get_atributos_pe(self, obj):
         relaciones = AtributoPECedula.objects.filter(cedula=obj)
         return AtributoPECedulaHerramientasSerializer(relaciones, many=True).data
+    
+    def get_calificaciones(self, obj):
+        calificaciones = CalificacionCedula.objects.filter(cedula=obj).order_by('apellido1_alumno', 'apellido2_alumno', 'nombre_alumno')
+        return CalificacionCedulaSerializer(calificaciones, many=True).data
+    
+    def get_estadisticas(self, obj):
+        calificaciones = CalificacionCedula.objects.filter(cedula=obj)
+        
+        if not calificaciones.exists():
+            return {
+                "total_alumnos": 0,
+                "promedio": 0,
+                "acreditados": 0,
+                "no_acreditados": 0,
+                "porcentaje_acreditados": 0,
+                "porcentaje_no_acreditados": 0
+            }
+        
+        total_alumnos = calificaciones.count()
+        promedio = calificaciones.aggregate(Avg('valor_calificacion'))['valor_calificacion__avg']
+        acreditados = calificaciones.filter(valor_calificacion__gte=70).count()
+        no_acreditados = calificaciones.filter(valor_calificacion__lt=70).count()
+        
+        porcentaje_acreditados = (acreditados / total_alumnos * 100) if total_alumnos > 0 else 0
+        porcentaje_no_acreditados = (no_acreditados / total_alumnos * 100) if total_alumnos > 0 else 0
+        
+        return {
+            "total_alumnos": total_alumnos,
+            "promedio": round(promedio, 2) if promedio else 0,
+            "acreditados": acreditados,
+            "no_acreditados": no_acreditados,
+            "porcentaje_acreditados": round(porcentaje_acreditados, 2),
+            "porcentaje_no_acreditados": round(porcentaje_no_acreditados, 2)
+        }
 
 class CedulaProgramaAsignaturaSerializer(serializers.ModelSerializer):
     programa = ProgramaEducativoSerializer(read_only=True)
@@ -735,4 +785,20 @@ class ProfesorAnteriorCedulaSerializer(serializers.ModelSerializer):
         model = ProfesorAnteriorCedula
         fields = [
             "id", "nombres", "apellidos", "formacion_nombre", "experiencia_profesional",
+        ]
+
+class CalificacionCedulaSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = CalificacionCedula
+        fields = [
+            'id',
+            'matricula', 'nombre_alumno', 'apellido1_alumno', 'apellido2_alumno',
+            'valor_calificacion',
+        ]
+
+class ActividadCedulaSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = ActividadCedula
+        fields = [
+            'id', 'nombre_actividad', 'descripcion_actividad',
         ]

@@ -67,9 +67,8 @@ class EvaluacionIndicador(models.Model):
     ]
     
     indicador = models.ForeignKey(Indicador, on_delete=models.PROTECT)
-    curso = models.ForeignKey('core.Curso', on_delete=models.PROTECT)
+    profesor_curso = models.ForeignKey('gestion_de_profesores.ProfesorCurso', on_delete=models.PROTECT)
     
-    grupo_seccion = models.CharField(max_length=50)
     instrumento_evaluacion = models.CharField(max_length=100)
     descripcion_instrumento = models.TextField(null=True, blank=True)
     periodo_evaluacion = models.CharField(max_length=50)

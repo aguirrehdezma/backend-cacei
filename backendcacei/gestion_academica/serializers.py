@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from gestion_academica.models import Alumno, AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, Calificacion, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, Practica, UnidadTematica
+from gestion_academica.models import Actividad, Alumno, AtributoCACEI, AtributoPE, AtributoPECACEI, AtributoPEObjetivo, Bibliografia, Calificacion, CriterioDesempeno, CursoAtributoPE, CursoEje, EjeConocimiento, EstrategiaEnsenanza, EstrategiaEvaluacion, HorasSemana, ObjetivoEducacional, ObjetivoEspecifico, Practica, UnidadTematica
 
 class UnidadTematicaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -108,4 +108,10 @@ class CalificacionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Calificacion
         fields = ['id', 'alumno', 'profesor_curso', 'valor']
+        read_only_fields = ['id']
+
+class ActividadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actividad
+        fields = ['id', 'profesor_curso', 'atributo_pe', 'nombre', 'descripcion']
         read_only_fields = ['id']
